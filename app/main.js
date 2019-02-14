@@ -8,6 +8,11 @@ let renderer, scene, camera;
 let controls; // eslint-disable-line no-unused-vars
 //let coordinates = 'data/random_on_land_000.json';
 
+let coordinates1 = [];
+let coordinates2 = [];
+let coordinates3 = [];
+
+let objectSize = 1;
 
 (function main() {
 
@@ -16,10 +21,7 @@ let controls; // eslint-disable-line no-unused-vars
 
 })();
 
-
 function setup() {
-
-  let coordinates = [];
 
   // fetch("../data/random_on_land_000.json")
   //   .then(function(resp) {
@@ -34,14 +36,22 @@ function setup() {
   var request = new XMLHttpRequest();
   request.open("GET","../data/random_on_land_000.json", false);
   request.send(null);
-  var data = JSON.parse(request.responseText);
+  var data1 = JSON.parse(request.responseText);
+
+  request.open("GET","../data/random_on_land_001.json", false);
+  request.send(null);
+  var data2 = JSON.parse(request.responseText);
+
+  request.open("GET","../data/random_on_land_002.json", false);
+  request.send(null);
+  var data3 = JSON.parse(request.responseText);
 
   // console.log(data.length);
 
-  for(let u = 0; u < data.length; u++){
+  for(let u = 0; u < data1.length; u++){
 
-    let lat = data[u][0];
-    let lon = data[u][1];
+    let lat = data1[u][0];
+    let lon = data1[u][1];
 
     var cosLat = Math.cos(lat * Math.PI / 180.0);
     var sinLat = Math.sin(lat * Math.PI / 180.0);
@@ -52,10 +62,44 @@ function setup() {
     let y = rad * cosLat * sinLon;
     let z = rad * sinLat;
 
-    coordinates.push( {x: x, y: y, z: z} );
+    coordinates1.push( {x: x, y: y, z: z} );
   }
 
-  console.log(coordinates);
+  for(let u = 0; u < data2.length; u++){
+
+    let lat = data2[u][0];
+    let lon = data2[u][1];
+
+    cosLat = Math.cos(lat * Math.PI / 180.0);
+    sinLat = Math.sin(lat * Math.PI / 180.0);
+    cosLon = Math.cos(lon * Math.PI / 180.0);
+    sinLon = Math.sin(lon * Math.PI / 180.0);
+    rad = 40.0;
+    let x = rad * cosLat * cosLon;
+    let y = rad * cosLat * sinLon;
+    let z = rad * sinLat;
+
+    coordinates2.push( {x: x, y: y, z: z} );
+  }
+
+  for(let u = 0; u < data3.length; u++){
+
+    let lat = data3[u][0];
+    let lon = data3[u][1];
+
+    cosLat = Math.cos(lat * Math.PI / 180.0);
+    sinLat = Math.sin(lat * Math.PI / 180.0);
+    cosLon = Math.cos(lon * Math.PI / 180.0);
+    sinLon = Math.sin(lon * Math.PI / 180.0);
+    rad = 40.0;
+    let x = rad * cosLat * cosLon;
+    let y = rad * cosLat * sinLon;
+    let z = rad * sinLat;
+
+    coordinates3.push( {x: x, y: y, z: z} );
+  }
+
+  // console.log(coordinates);
 
 
   renderer = new THREE.WebGLRenderer({
@@ -78,12 +122,47 @@ function setup() {
   // let mesh = new THREE.Mesh( geo, mat );
   // scene.add( mesh );
 
-  for(let i = 0; i < coordinates.length; i++){
-    let dotGeo = new THREE.SphereGeometry( 1, 2, 2 );
+  for(let i = 0; i < coordinates1.length; i++){
+    // let dotGeo = new THREE.CylinderBufferGeometry( objectSize, objectSize, objectSize/3, 6, 6 );
+    let dotGeo = new THREE.SphereGeometry( objectSize/4, 4, 4 );
     let mat = new THREE.MeshBasicMaterial({ color: 0x1e90ff, wireframe: false });
     let mesh = new THREE.Mesh( dotGeo, mat );
-    mesh.position.set(coordinates[i].x, coordinates[i].y, coordinates[i].z);
+    mesh.position.set(coordinates1[i].x, coordinates1[i].y, coordinates1[i].z);
     scene.add( mesh );
+  }
+
+  // connect
+
+  connect();
+
+  // for(let i = 0; i < coordinates2.length; i++){
+  //   let dotGeo = new THREE.SphereGeometry( objectSize/4, 4, 4 );
+  //   let mat = new THREE.MeshBasicMaterial({ color: 0xCCCCCC, wireframe: false });
+  //   let mesh = new THREE.Mesh( dotGeo, mat );
+  //   mesh.position.set(coordinates2[i].x, coordinates2[i].y, coordinates2[i].z);
+  //   scene.add( mesh );
+  // }
+  //
+  // for(let i = 0; i < coordinates3.length; i++){
+  //   let dotGeo = new THREE.SphereGeometry( objectSize/4, 4, 4 );
+  //   let mat = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: false });
+  //   let mesh = new THREE.Mesh( dotGeo, mat );
+  //   mesh.position.set(coordinates3[i].x, coordinates3[i].y, coordinates3[i].z);
+  //   scene.add( mesh );
+  // }
+
+}
+
+function connect(){
+  for(let i = 0; i < coordinates1.length; i++){
+    let connectionMat = new THREE.LineBasicMaterial( { color: 0x1e90ff } );
+
+    var geometry = new THREE.Geometry();
+    geometry.vertices.push(new THREE.Vector3(0, 0, 0) );
+    geometry.vertices.push(new THREE.Vector3( coordinates1[i].x, coordinates1[i].y, coordinates1[i].z) );
+
+    var line = new THREE.Line( geometry, connectionMat );
+    scene.add( line );
   }
 }
 
