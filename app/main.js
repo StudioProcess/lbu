@@ -14,7 +14,8 @@ let coordinates3 = [];
 
 let splines = [];
 
-let objectSize = 1;
+let objectSize = 3;
+let connectionWidth = 0.2;
 
 (function main() {
 
@@ -111,7 +112,7 @@ function setup() {
   });
   renderer.setSize( W, H );
   renderer.setPixelRatio( window.devicePixelRatio );
-  renderer.setClearColor(0xFFFFFF);
+  renderer.setClearColor(0xf3f3f3);
   document.body.appendChild( renderer.domElement );
 
   scene = new THREE.Scene();
@@ -126,8 +127,8 @@ function setup() {
 
   for(let i = 0; i < coordinates1.length; i++){
     // let dotGeo = new THREE.CylinderBufferGeometry( objectSize, objectSize, objectSize/3, 6, 6 );
-    let dotGeo = new THREE.SphereGeometry( objectSize/4, 4, 4 );
-    let mat = new THREE.MeshBasicMaterial({ color: 0x1e90ff, wireframe: false });
+    let dotGeo = new THREE.SphereGeometry( objectSize/4, 10, 10 );
+    let mat = new THREE.MeshLambertMaterial({ color: 0x14193c, flatShading: true });
     let mesh = new THREE.Mesh( dotGeo, mat );
     mesh.position.set(coordinates1[i].x, coordinates1[i].y, coordinates1[i].z);
     scene.add( mesh );
@@ -136,7 +137,12 @@ function setup() {
   // connect
 
   // connectToCenter();
-  connectPath2();
+  volumeConnect();
+
+  var ambientLight = new THREE.AmbientLight( 0x404040, 5 ); // soft white light
+  var directionalLight = new THREE.PointLight( 0xffffff, 20, 50 );
+  scene.add( directionalLight );
+  scene.add( ambientLight );
 
 
 
@@ -184,15 +190,13 @@ function connectPath(){
   }
 }
 
-function connectPath2(){
+function volumeConnect(){
   // https://threejs.org/examples/#webgl_geometry_extrude_splines
 
-  let splineMat = new THREE.MeshBasicMaterial( { color: 0xffed00, wireframe: false } );
+  let splineMat = new THREE.MeshLambertMaterial( { color: 0x1e90ff, flatShading: false, wireframe: false, transparent: true, opacity: 0.8 } );
   var centerX = 0;
   var centerY = 0;
   var centerZ = 0;
-
-  var radius = 0.1;
 
   for(let i = 0; i < coordinates1.length; i++){
 
@@ -207,12 +211,12 @@ function connectPath2(){
     );
 
     splines.push ( spline );
-    var tubeGeometry = new THREE.TubeBufferGeometry( spline, 4, radius, 4, false );
+    var tubeGeometry = new THREE.TubeBufferGeometry( spline, 4, connectionWidth, 4, false );
 
     let mesh = new THREE.Mesh( tubeGeometry, splineMat );
     // var wireframe = new THREE.Mesh( geometry, wireframeMaterial );
     // mesh.add( wireframe );
-    console.log( spline );
+    // console.log( spline );
     scene.add( mesh );
 
 
