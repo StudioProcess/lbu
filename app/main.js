@@ -12,6 +12,8 @@ let coordinates1 = [];
 let coordinates2 = [];
 let coordinates3 = [];
 
+let splines = [];
+
 let objectSize = 1;
 
 (function main() {
@@ -133,7 +135,10 @@ function setup() {
 
   // connect
 
-  connect();
+  // connectToCenter();
+  connectPath2();
+
+
 
   // for(let i = 0; i < coordinates2.length; i++){
   //   let dotGeo = new THREE.SphereGeometry( objectSize/4, 4, 4 );
@@ -153,7 +158,7 @@ function setup() {
 
 }
 
-function connect(){
+function connectToCenter(){
   for(let i = 0; i < coordinates1.length; i++){
     let connectionMat = new THREE.LineBasicMaterial( { color: 0x1e90ff } );
 
@@ -164,6 +169,55 @@ function connect(){
     var line = new THREE.Line( geometry, connectionMat );
     scene.add( line );
   }
+}
+
+function connectPath(){
+  for(let i = 0; i < coordinates1.length; i++){
+    let connectionMat = new THREE.LineBasicMaterial( { color: 0x1e90ff } );
+
+    var geometry = new THREE.Geometry();
+    geometry.vertices.push(new THREE.Vector3( coordinates1[i].x, coordinates1[i].y, coordinates1[i].z ) );
+    geometry.vertices.push(new THREE.Vector3( coordinates2[i].x, coordinates2[i].y, coordinates2[i].z ) );
+
+    var line = new THREE.Line( geometry, connectionMat );
+    scene.add( line );
+  }
+}
+
+function connectPath2(){
+  // https://threejs.org/examples/#webgl_geometry_extrude_splines
+
+  let splineMat = new THREE.MeshBasicMaterial( { color: 0xffed00, wireframe: false } );
+  var centerX = 0;
+  var centerY = 0;
+  var centerZ = 0;
+
+  var radius = 0.1;
+
+  for(let i = 0; i < coordinates1.length; i++){
+
+    var midpointX = (coordinates1[i].x+centerX)/2;
+    var midpointY = (coordinates1[i].y+centerY)/2;
+    var midpointZ = (coordinates1[i].z+centerZ)/2;
+
+    var spline = new THREE.QuadraticBezierCurve3(
+      new THREE.Vector3( coordinates1[i].x, coordinates1[i].y, coordinates1[i].z ),
+      new THREE.Vector3( midpointX, midpointY, midpointZ ),
+      new THREE.Vector3( 0, 0, 0 )
+    );
+
+    splines.push ( spline );
+    var tubeGeometry = new THREE.TubeBufferGeometry( spline, 4, radius, 4, false );
+
+    let mesh = new THREE.Mesh( tubeGeometry, splineMat );
+    // var wireframe = new THREE.Mesh( geometry, wireframeMaterial );
+    // mesh.add( wireframe );
+    console.log( spline );
+    scene.add( mesh );
+
+
+  }
+
 }
 
 
