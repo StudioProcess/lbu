@@ -12,8 +12,9 @@ let coordinates1 = [];
 
 let splines = [];
 
-let objectSize = 3;
-let connectionWidth = 0.15;
+let objectSize = 1.3;
+let centerConnectionWidth = 0.05;
+let pathConnectionWidth = 0.05;
 
 let pointHistory = 10; // path
 
@@ -29,7 +30,7 @@ let numberOfPoints = 321;
 function setup() {
 
   var request = new XMLHttpRequest();
-  request.open("GET","../data/on_land_stream_000.json", false);
+  request.open("GET","../data/on_land_stream_001.json", false);
   request.send(null);
   var data1 = JSON.parse(request.responseText);
 
@@ -66,9 +67,9 @@ function setup() {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera( 75, W / H, 0.01, 1000 );
   controls = new THREE.OrbitControls( camera, renderer.domElement );
-  camera.position.z = 100;
+  camera.position.z = 80;
 
-  // showDots();
+  showDots();
   // connectToCenter();
   volumeConnect();
   connectPath();
@@ -87,14 +88,17 @@ function showDots(){
     let mat = null;
     if(i%pointHistory==0) {
       dotGeo = new THREE.SphereGeometry( objectSize/4, 5, 5 );
-      mat = new THREE.MeshLambertMaterial({ color: 0x14193c, flatShading: true });
-    } else {
-      dotGeo = new THREE.SphereGeometry( objectSize/12, 5, 5 );
       mat = new THREE.MeshLambertMaterial({ color: 0xda4c40, flatShading: true });
+      let mesh = new THREE.Mesh( dotGeo, mat );
+      mesh.position.set(coordinates1[i].x, coordinates1[i].y, coordinates1[i].z);
+      scene.add( mesh );
+    } else {
+      // dotGeo = new THREE.SphereGeometry( objectSize/12, 5, 5 );
+      // mat = new THREE.MeshLambertMaterial({ color: 0xda4c40, flatShading: true });
+      // let mesh = new THREE.Mesh( dotGeo, mat );
+      // mesh.position.set(coordinates1[i].x, coordinates1[i].y, coordinates1[i].z);
+      // scene.add( mesh );
     }
-    let mesh = new THREE.Mesh( dotGeo, mat );
-    mesh.position.set(coordinates1[i].x, coordinates1[i].y, coordinates1[i].z);
-    scene.add( mesh );
   }
 }
 
@@ -167,7 +171,7 @@ function connectPath(){
       );
 
       splines.push ( spline );
-      var tubeGeometry = new THREE.TubeBufferGeometry( spline, 4, connectionWidth, 4, false );
+      var tubeGeometry = new THREE.TubeBufferGeometry( spline, 4, pathConnectionWidth, 4, false );
 
       let mesh = new THREE.Mesh( tubeGeometry, splineMat );
       // var wireframe = new THREE.Mesh( geometry, wireframeMaterial );
@@ -201,7 +205,7 @@ function volumeConnect(){
       );
 
       splines.push ( spline );
-      var tubeGeometry = new THREE.TubeBufferGeometry( spline, 4, connectionWidth, 4, false );
+      var tubeGeometry = new THREE.TubeBufferGeometry( spline, 4, centerConnectionWidth, 4, false );
 
       let mesh = new THREE.Mesh( tubeGeometry, splineMat );
       // var wireframe = new THREE.Mesh( geometry, wireframeMaterial );
