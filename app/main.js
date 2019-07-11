@@ -14,9 +14,9 @@ let splines = [];
 
 let objectSize = 1.3;
 let centerConnectionWidth = 0.05;
-let pathConnectionWidth = 0.05;
+let pathConnectionWidth = 0.09;
 
-let pointHistory = 10; // path
+let pointHistory = 5; // path ... maximum: 100
 
 let numberOfPoints = 321;
 
@@ -30,7 +30,7 @@ let numberOfPoints = 321;
 function setup() {
 
   var request = new XMLHttpRequest();
-  request.open("GET","../data/on_land_stream_001.json", false);
+  request.open("GET","./data/on_land_stream_001.json", false);
   request.send(null);
   var data1 = JSON.parse(request.responseText);
 
@@ -51,6 +51,17 @@ function setup() {
       let z = rad * sinLat;
 
       coordinates1.push( {x: x, y: y, z: z} );
+
+      let projectColors = {
+        interference: '#2551a7',
+        airplane_geometry: '#1a1f39',
+        pillars: '#fdff4d',
+        space_colonization: '#ada77e',
+        flash_flooding: '#beeaff',
+        universe: '#e73145',
+        patterns: '#afe76e',
+        other: '#e8e8e8'
+      };
     }
   }
 
@@ -82,16 +93,18 @@ function setup() {
 }
 
 function showDots(){
+  let numberDots = 0;
   for(let i = 0; i < coordinates1.length; i++){
     // let dotGeo = new THREE.CylinderBufferGeometry( objectSize, objectSize, objectSize/3, 6, 6 );
     let dotGeo = null;
     let mat = null;
-    if(i%pointHistory==0) {
+    if(i%pointHistory==0 && numberDots<numberOfPoints) {
       dotGeo = new THREE.SphereGeometry( objectSize/4, 5, 5 );
       mat = new THREE.MeshLambertMaterial({ color: 0xda4c40, flatShading: true });
       let mesh = new THREE.Mesh( dotGeo, mat );
       mesh.position.set(coordinates1[i].x, coordinates1[i].y, coordinates1[i].z);
       scene.add( mesh );
+      numberDots++;
     } else {
       // dotGeo = new THREE.SphereGeometry( objectSize/12, 5, 5 );
       // mat = new THREE.MeshLambertMaterial({ color: 0xda4c40, flatShading: true });
@@ -179,6 +192,7 @@ function connectPath(){
       // console.log( spline );
       scene.add( mesh );
     }
+    // i+=pointHistory;
     first = false;
   }
 }
@@ -186,7 +200,7 @@ function connectPath(){
 function volumeConnect(){
   // https://threejs.org/examples/#webgl_geometry_extrude_splines
 
-  let splineMat = new THREE.MeshLambertMaterial( { color: 0x8b8b8b, flatShading: false, wireframe: false, transparent: true, opacity: 0.8 } );
+  let splineMat = new THREE.MeshLambertMaterial( { color: 0xda4c40, flatShading: false, wireframe: false, transparent: true, opacity: 0.8 } );
   var centerX = 0;
   var centerY = 0;
   var centerZ = 0;
