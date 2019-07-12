@@ -19,12 +19,25 @@ canvas {
 }
 
 .menu {
+  width: auto !important;
+  height: 30px !important;
+  /* background-color: #ffffff; */
+  top: 15px;
+  right: 15px;
+  padding-left: 20px;
+  position: fixed;
+  font-family: sans-serif;
+  font-size: 20px;
+  z-index: 1;
+}
+
+.logo {
   width: 100% !important;
   height: 30px !important;
   /* background-color: #ffffff; */
   top: 15px;
   padding-left: 20px;
-  position: absolute;
+  position: fixed;
   font-family: sans-serif;
   font-size: 20px;
   z-index: 1;
