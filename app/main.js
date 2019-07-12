@@ -13,12 +13,25 @@ let coordinates1 = [];
 let splines = [];
 
 let objectSize = 1.3;
-let centerConnectionWidth = 0.05;
-let pathConnectionWidth = 0.09;
+let centerConnectionWidth = 0.09;
+let pathConnectionWidth = 0.15;
 
-let pointHistory = 5; // path ... maximum: 100
+let pointHistory = 4; // path ... maximum: 100
 
 let numberOfPoints = 321;
+
+let projectColors = [
+  '#ce3b43',
+  '#2452c2',
+  '#f2c200',
+  '#b94db3',
+  '#9bcfe4',
+  '#b7b5a8',
+  '#1e1e1a',
+  '#ccf0fd'
+];
+
+let pointColorIndex = [];
 
 (function main() {
 
@@ -33,6 +46,11 @@ function setup() {
   request.open("GET","./data/on_land_stream_001.json", false);
   request.send(null);
   var data1 = JSON.parse(request.responseText);
+
+  for(let i = 1; i <= numberOfPoints; i++) {
+    let randColorIndex = getRndInteger(0, projectColors.length-2);
+    pointColorIndex.push(randColorIndex);
+  }
 
   for(let u = 0; u < data1.length; u++){ // 321 points
 
@@ -51,17 +69,6 @@ function setup() {
       let z = rad * sinLat;
 
       coordinates1.push( {x: x, y: y, z: z} );
-
-      let projectColors = {
-        interference: '#2551a7',
-        airplane_geometry: '#1a1f39',
-        pillars: '#fdff4d',
-        space_colonization: '#ada77e',
-        flash_flooding: '#beeaff',
-        universe: '#e73145',
-        patterns: '#afe76e',
-        other: '#e8e8e8'
-      };
     }
   }
 
@@ -69,11 +76,11 @@ function setup() {
     antialias: true,
     alpha: true,
     preserveDrawingBuffer: true,
+    canvas: document.querySelector("canvas")
   });
   renderer.setSize( W, H );
   renderer.setPixelRatio( window.devicePixelRatio );
-  renderer.setClearColor(0xf3f3f3);
-  document.body.appendChild( renderer.domElement );
+  renderer.setClearColor(projectColors[7]);
 
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera( 75, W / H, 0.01, 1000 );
@@ -81,7 +88,7 @@ function setup() {
   camera.position.z = 80;
 
   showDots();
-  // connectToCenter();
+  //connectToCenter();
   volumeConnect();
   connectPath();
 
@@ -90,6 +97,8 @@ function setup() {
   // var directionalLight = new THREE.PointLight( 0xffffff, 20, 50 );
   // scene.add( directionalLight );
   scene.add( ambientLight );
+
+  console.log( pointColorIndex );
 }
 
 function showDots(){
@@ -100,7 +109,9 @@ function showDots(){
     let mat = null;
     if(i%pointHistory==0 && numberDots<numberOfPoints) {
       dotGeo = new THREE.SphereGeometry( objectSize/4, 5, 5 );
-      mat = new THREE.MeshLambertMaterial({ color: 0xda4c40, flatShading: true });
+      // let randColorIndex = getRndInteger(0, projectColors.length-2);
+      console.log(pointColorIndex[numberDots]);
+      mat = new THREE.MeshLambertMaterial({ color: projectColors[pointColorIndex[numberDots]], flatShading: true });
       let mesh = new THREE.Mesh( dotGeo, mat );
       mesh.position.set(coordinates1[i].x, coordinates1[i].y, coordinates1[i].z);
       scene.add( mesh );
@@ -131,7 +142,8 @@ function connectToCenter(){
 
 function connectPath(){
   let first = true;
-  let splineMat = new THREE.MeshLambertMaterial( { color: 0x000000, flatShading: false, wireframe: false, transparent: true, opacity: 0.8 } );
+
+  // let splineMat = new THREE.MeshLambertMaterial( { color: 0xedbe00, flatShading: false, wireframe: false, transparent: true, opacity: 0.8 } );
 
   var startX;
   var startY;
@@ -186,6 +198,9 @@ function connectPath(){
       splines.push ( spline );
       var tubeGeometry = new THREE.TubeBufferGeometry( spline, 4, pathConnectionWidth, 4, false );
 
+      // let randColorIndex = getRndInteger(0, projectColors.length-2);
+      let splineMat = new THREE.MeshLambertMaterial( { color: projectColors[pointColorIndex[i]], flatShading: false, wireframe: false, transparent: true, opacity: 0.8 } );
+
       let mesh = new THREE.Mesh( tubeGeometry, splineMat );
       // var wireframe = new THREE.Mesh( geometry, wireframeMaterial );
       // mesh.add( wireframe );
@@ -200,7 +215,7 @@ function connectPath(){
 function volumeConnect(){
   // https://threejs.org/examples/#webgl_geometry_extrude_splines
 
-  let splineMat = new THREE.MeshLambertMaterial( { color: 0xda4c40, flatShading: false, wireframe: false, transparent: true, opacity: 0.8 } );
+  let splineMat = new THREE.MeshLambertMaterial( { color: 0xccf0fd, flatShading: false, wireframe: false, transparent: true, opacity: 0.8 } );
   var centerX = 0;
   var centerY = 0;
   var centerZ = 0;
@@ -229,6 +244,11 @@ function volumeConnect(){
     }
   }
 
+}
+
+// always returns a random number between min and max (both included)
+function getRndInteger(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) ) + min;
 }
 
 

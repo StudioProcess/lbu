@@ -12,6 +12,20 @@ body {
 }
 
 canvas {
+  position: absolute;
   width: 100% !important;
   height: auto !important;
+  z-index: -1;
+}
+
+.menu {
+  width: 100% !important;
+  height: 30px !important;
+  /* background-color: #ffffff; */
+  top: 15px;
+  padding-left: 20px;
+  position: absolute;
+  font-family: sans-serif;
+  font-size: 20px;
+  z-index: 1;
 }
