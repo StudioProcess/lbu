@@ -1,3 +1,5 @@
+import * as THREE from '../node_modules/three/build/three.module.js';
+import { OrbitControls } from '../node_modules/three/examples/jsm/controls/OrbitControls.js';
 import * as util from './util.js';
 // import * as data from '../data/random_on_land_000.json';
 
@@ -84,7 +86,7 @@ function setup() {
 
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera( 75, W / H, 0.01, 1000 );
-  controls = new THREE.OrbitControls( camera, renderer.domElement );
+  controls = new OrbitControls( camera, renderer.domElement );
   camera.position.z = 80;
 
   showDots();
