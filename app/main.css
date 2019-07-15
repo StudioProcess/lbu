@@ -53,3 +53,12 @@ canvas {
   height: auto !important;
   background-color: #ccf0fd;
 }
+
+.menu a {
+  color: #000000;
+  text-decoration: none;
+}
+
+.menu a:hover {
+  text-decoration: underline;
+}

@@ -111,7 +111,7 @@ function showDots(){
       dotGeo = new THREE.SphereGeometry( objectSize/4, 5, 5 );
       // let randColorIndex = getRndInteger(0, projectColors.length-2);
       // console.log(pointColorIndex[numberDots]);
-      mat = new THREE.MeshLambertMaterial({ color: projectColors[pointColorIndex[numberDots]], flatShading: true, transparent: true, opacity: 0.99 });
+      mat = new THREE.MeshLambertMaterial({ color: projectColors[pointColorIndex[numberDots]], flatShading: true, transparent: true, opacity: 0.8 });
       let mesh = new THREE.Mesh( dotGeo, mat );
       mesh.position.set(coordinates1[i].x, coordinates1[i].y, coordinates1[i].z);
       scene.add( mesh );
