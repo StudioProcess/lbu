@@ -14,9 +14,9 @@ let coordinates1 = [];
 
 let splines = [];
 
-let objectSize = 1.3;
+let objectSize = 1.7;
 let centerConnectionWidth = 0.09;
-let pathConnectionWidth = 0.15;
+let pathConnectionWidth = 0.39;
 
 let pointHistory = 4; // path ... maximum: 100
 
@@ -87,10 +87,10 @@ function setup() {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera( 75, W / H, 0.01, 1000 );
   controls = new OrbitControls( camera, renderer.domElement );
-  camera.position.z = 80;
+  camera.position.z = 70;
 
   showDots();
-  //connectToCenter();
+  // connectToCenter();
   volumeConnect();
   connectPath();
 
@@ -99,8 +99,6 @@ function setup() {
   // var directionalLight = new THREE.PointLight( 0xffffff, 20, 50 );
   // scene.add( directionalLight );
   scene.add( ambientLight );
-
-  console.log( pointColorIndex );
 }
 
 function showDots(){
@@ -112,8 +110,8 @@ function showDots(){
     if(i%pointHistory==0 && numberDots<numberOfPoints) {
       dotGeo = new THREE.SphereGeometry( objectSize/4, 5, 5 );
       // let randColorIndex = getRndInteger(0, projectColors.length-2);
-      console.log(pointColorIndex[numberDots]);
-      mat = new THREE.MeshLambertMaterial({ color: projectColors[pointColorIndex[numberDots]], flatShading: true });
+      // console.log(pointColorIndex[numberDots]);
+      mat = new THREE.MeshLambertMaterial({ color: projectColors[pointColorIndex[numberDots]], flatShading: true, transparent: true, opacity: 0.99 });
       let mesh = new THREE.Mesh( dotGeo, mat );
       mesh.position.set(coordinates1[i].x, coordinates1[i].y, coordinates1[i].z);
       scene.add( mesh );
@@ -217,7 +215,7 @@ function connectPath(){
 function volumeConnect(){
   // https://threejs.org/examples/#webgl_geometry_extrude_splines
 
-  let splineMat = new THREE.MeshLambertMaterial( { color: 0xccf0fd, flatShading: false, wireframe: false, transparent: true, opacity: 0.8 } );
+  let splineMat = new THREE.MeshLambertMaterial( { color: 0xccf0fd, flatShading: false, wireframe: false, transparent: true, opacity: 0.2 } );
   var centerX = 0;
   var centerY = 0;
   var centerZ = 0;
@@ -241,10 +239,11 @@ function volumeConnect(){
       let mesh = new THREE.Mesh( tubeGeometry, splineMat );
       // var wireframe = new THREE.Mesh( geometry, wireframeMaterial );
       // mesh.add( wireframe );
-      console.log( "spline" );
       scene.add( mesh );
     }
   }
+
+  console.log(scene);
 
 }
 
@@ -256,9 +255,15 @@ function getRndInteger(min, max) {
 
 function loop(time) { // eslint-disable-line no-unused-vars
 
+  //using timer as animation
+  var speed = Date.now() * 0.00005;
+  camera.position.x = Math.cos(speed) * 60;
+  camera.position.z = Math.sin(speed) * 60;
+
+  camera.lookAt(scene.position);
+
   requestAnimationFrame( loop );
   renderer.render( scene, camera );
-
 }
 
 

@@ -15,16 +15,13 @@ canvas {
   position: fixed;
   width: 100% !important;
   height: auto !important;
-  z-index: -1;
 }
 
 .menu {
   width: auto !important;
   height: 30px !important;
-  /* background-color: #ffffff; */
   top: 15px;
   right: 15px;
-  padding-left: 20px;
   position: fixed;
   font-family: sans-serif;
   font-size: 20px;
@@ -34,11 +31,25 @@ canvas {
 .logo {
   width: 100% !important;
   height: 30px !important;
-  /* background-color: #ffffff; */
   top: 15px;
-  padding-left: 20px;
+  left: 15px;
   position: fixed;
   font-family: sans-serif;
   font-size: 20px;
   z-index: 1;
+}
+
+.bg {
+  position: fixed;
+  width: 100% !important;
+  height: 100% !important;
+  background-color: #ccf0fd;
+  z-index: -1;
+}
+
+.description {
+  position: relative;
+  width: 100% !important;
+  height: auto !important;
+  background-color: #ccf0fd;
 }
