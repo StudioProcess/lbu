@@ -19,9 +19,14 @@ canvas {
 
 @media only screen and (min-width: 701px) {
   ul#menuitem li {
-    display:inline;
-    padding-right: 40px;
+    display: inline;
+    /* padding-right: 40px; */
+    padding: .25em;
+    padding-left: .45em;
+    padding-right: .45em;
+    background-color: #fff;
     margin: 0px !important;
+    font-weight: bold;
   }
   ul {
     margin-block-start: 0em !important;
@@ -64,12 +69,13 @@ canvas {
 }
 
 .menu a {
-  color: #000000;
+  color: #000;
   text-decoration: none;
 }
 
 .menu a:hover {
-  text-decoration: underline;
+  text-decoration: none;
+  color: #ce3b43;
 }
 
 @media only screen and (max-width: 700px) {
@@ -85,8 +91,14 @@ canvas {
   }
 
   ul#menuitem li {
-    display:inline;
-    padding-right: 10px;
+    display: inline;
+    /* padding-right: 40px; */
+    padding: .25em;
+    padding-left: .45em;
+    padding-right: .45em;
+    background-color: #fff;
+    margin: 0px !important;
+    font-weight: bold;
   }
 
   ul {
