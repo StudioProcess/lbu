@@ -16,9 +16,9 @@ let splines = [];
 
 let objectSize = 1.7;
 let centerConnectionWidth = 0.09;
-let pathConnectionWidth = 0.39;
+let pathConnectionWidth = 0.19;
 
-let pointHistory = 10; // path ... maximum: 100
+let pointHistory = 5; // path ... maximum: 100
 
 let numberOfPoints = 321;
 
