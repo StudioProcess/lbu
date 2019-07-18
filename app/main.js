@@ -18,7 +18,7 @@ let objectSize = 1.7;
 let centerConnectionWidth = 0.09;
 let pathConnectionWidth = 0.39;
 
-let pointHistory = 4; // path ... maximum: 100
+let pointHistory = 10; // path ... maximum: 100
 
 let numberOfPoints = 321;
 
@@ -80,6 +80,7 @@ function setup() {
     preserveDrawingBuffer: true,
     canvas: document.querySelector("canvas")
   });
+
   renderer.setSize( W, H );
   renderer.setPixelRatio( window.devicePixelRatio );
   renderer.setClearColor(projectColors[7]);

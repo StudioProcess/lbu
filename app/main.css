@@ -4,17 +4,16 @@ html, body {
 }
 
 body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   height: 100vh;
-  background-color: black;
+  background-color: #ccf0fd;
 }
 
 canvas {
-  position: fixed;
-  width: auto !important;
-  height: 100% !important;
+  display: flex;
+  width: auto;
+  height: 100%;
+  pointer-events: none;
+  margin: auto;
 }
 
 @media only screen and (min-width: 701px) {
@@ -35,7 +34,7 @@ canvas {
 .menu {
   width: auto !important;
   height: 30px !important;
-  top: 15px;
+  top: 35px;
   right: 15px;
   position: fixed;
   font-family: sans-serif;
@@ -45,7 +44,7 @@ canvas {
 
 .logo {
   height: 30px !important;
-  top: 15px;
+  top: 35px;
   left: 15px;
   position: fixed;
   font-family: sans-serif;
@@ -53,19 +52,22 @@ canvas {
   z-index: 1;
 }
 
-.bg {
-  position: fixed;
-  width: 100% !important;
-  height: 100% !important;
-  background-color: #ccf0fd;
-  z-index: -1;
-}
-
 .description {
-  position: relative;
-  width: 100% !important;
+  display: flex;
   height: auto !important;
   background-color: #ccf0fd;
+  font-family: sans-serif;
+  font-size: 20px;
+  padding: 6em;
+}
+
+.contribute {
+  display: flex;
+  height: auto !important;
+  background-color: #ccf0fd;
+  font-family: sans-serif;
+  font-size: 20px;
+  padding: 6em;
 }
 
 .menu a {
@@ -75,14 +77,14 @@ canvas {
 
 .menu a:hover {
   text-decoration: none;
-  color: #ce3b43;
+  color: #ff5555;
 }
 
 @media only screen and (max-width: 700px) {
   .logo {
     width: 80% !important;
     height: 80px !important;
-    top: 15px;
+    top: 35px;
     left: 15px;
     position: fixed;
     font-family: sans-serif;
@@ -107,5 +109,13 @@ canvas {
 
   .logo img {
     max-width: 100px;
+  }
+
+  .description {
+    height: auto !important;
+    background-color: #ccf0fd;
+    font-family: sans-serif;
+    font-size: 20px;
+    padding: 1em;
   }
 }
