@@ -52,6 +52,11 @@ canvas {
   z-index: 1;
 }
 
+.headline {
+  display: block !important;
+  font-weight: bold;
+}
+
 .description {
   display: flex;
   height: auto !important;
