@@ -26,10 +26,20 @@ canvas {
 
 .row-info {
   padding: 2em;
+  padding-top: 10em;
+  padding-bottom: 10em;
 }
 
 .light {
   background-color: #dbf5ff;
+}
+
+.counter {
+  position: absolute;
+  right: 2em;
+  bottom: 35px;
+  font-size: 40px;
+  font-weight: bold;
 }
 
 @media only screen and (min-width: 760px) {
@@ -66,6 +76,7 @@ canvas {
   .menutext {
     background-color: #fff;
     margin: 0.1em !important;
+    color: #000 !important;
   }
 
   ul#menuitem li {
@@ -115,6 +126,7 @@ canvas {
 
   .menutext {
     background-color: #fff;
+    color: #000 !important;
     margin: 0.1em !important;
   }
 }
