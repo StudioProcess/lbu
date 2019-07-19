@@ -15,7 +15,7 @@ let coordinates1 = [];
 let splines = [];
 
 let objectSize = 1.7;
-let centerConnectionWidth = 0.09;
+let centerConnectionWidth = 0.11;
 let pathConnectionWidth = 0.19;
 
 let pointHistory = 5; // path ... maximum: 100
@@ -216,7 +216,7 @@ function connectPath(){
 function volumeConnect(){
   // https://threejs.org/examples/#webgl_geometry_extrude_splines
 
-  let splineMat = new THREE.MeshLambertMaterial( { color: 0xccf0fd, flatShading: false, wireframe: false, transparent: true, opacity: 0.2 } );
+  let splineMat = new THREE.MeshLambertMaterial( { color: 0xccf0fd, flatShading: false, wireframe: false, transparent: true, opacity: 0.8 } );
   var centerX = 0;
   var centerY = 0;
   var centerZ = 0;
@@ -244,7 +244,7 @@ function volumeConnect(){
     }
   }
 
-  console.log(scene);
+  // console.log(scene);
 
 }
 
