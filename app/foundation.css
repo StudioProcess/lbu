@@ -44,10 +44,18 @@ canvas {
   overflow: hidden;
 }
 
+.credits {
+  padding-top: 2em;
+}
+
 .row-info {
   padding: 2em;
   padding-top: 10em;
-  padding-bottom: 10em;
+  padding-bottom: 10em !important;
+}
+
+.uploadbutton {
+  padding-bottom: 10em !important;
 }
 
 .light {
