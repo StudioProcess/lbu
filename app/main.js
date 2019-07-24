@@ -268,15 +268,15 @@ function loop(time) { // eslint-disable-line no-unused-vars
 }
 
 
-document.addEventListener('keydown', e => {
-  // console.log(e.key, e.keyCode, e);
-
-  if (e.key == 'f') { // f .. fullscreen
-    util.toggleFullscreen();
-  }
-
-  else if (e.key == 's') {
-    util.saveCanvas();
-  }
-
-});
+// document.addEventListener('keydown', e => {
+//   // console.log(e.key, e.keyCode, e);
+//
+//   if (e.key == 'f') { // f .. fullscreen
+//     util.toggleFullscreen();
+//   }
+//
+//   else if (e.key == 's') {
+//     util.saveCanvas();
+//   }
+//
+// });
