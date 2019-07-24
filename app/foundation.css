@@ -60,9 +60,11 @@ canvas {
   border: none;
   font-size: 17px;
   padding: 2em;
-  background-color: #FFF;
+  outline-offset: -1em;
+  /* background-color: #FFF; */
   color: #000;
-  outline: 2px dashed #c6c6c6;
+  outline: 2px dashed #000;
+  align-items: center !important;
 }
 
 .messageupload {
@@ -71,6 +73,10 @@ canvas {
 
 .outercanvas {
   position: relative;
+}
+
+.menutext:hover {
+  color: #ff6666 !important;
 }
 
 @media only screen and (min-width: 760px) {
