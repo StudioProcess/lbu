@@ -1,3 +1,7 @@
+.outercanvas {
+  position: relative;
+}
+
 canvas {
   /* display: inline-block; */
   /* align-items: center; */
@@ -9,7 +13,7 @@ canvas {
   pointer-events: none;
   margin: auto; */
   position: relative;
-  top: 50%;
+  right: 50%;
   left: 50%;
   min-width: 100%;
   min-height: 100%;
@@ -19,11 +23,10 @@ canvas {
   -moz-transform: translateX(-50%);/* translateY(-50%); */
   -webkit-transform: translateX(-50%);/* translateY(-50%); */
   transform: translateX(-50%);/* translateY(-50%); */
-  /*background: url(assets/img/images/explosion.jpg) no-repeat;*/
   background-size: cover;
-  /* max-width:225%; */
+  max-width: 225%;
   pointer-events: none;
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 
 .credits {
@@ -60,10 +63,6 @@ canvas {
 
 .messageupload {
   margin-top: 1em;
-}
-
-.outercanvas {
-  position: relative;
 }
 
 .menutext:hover {
@@ -112,7 +111,7 @@ canvas {
     bottom: 1.7em;
     right: 2em !important;
     font-weight: bold;
-    display: flex;
+    /* display: flex; */
     text-align: right;
     line-height: 1.0;
     font-size: 20px;
@@ -162,7 +161,7 @@ canvas {
     bottom: 1.7em;
     right: 0.5em !important;
     font-weight: bold;
-    display: flex;
+    /* display: flex; */
     text-align: right;
     line-height: 1.0;
     font-size: 15px;
