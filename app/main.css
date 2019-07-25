@@ -50,6 +50,7 @@ canvas {
   padding: 10px;
   line-height: 50px;
   font-size: 25px;
+  margin-bottom: 0.3em;
 }
 
 .delete {
