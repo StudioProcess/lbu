@@ -44,6 +44,9 @@ let pointColorIndex = [];
 
 function setup() {
 
+  initFirebase();
+  initCounters();
+  
   var request = new XMLHttpRequest();
   request.open("GET","./data/on_land_stream_001.json", false);
   request.send(null);
@@ -274,3 +277,44 @@ function loop(time) { // eslint-disable-line no-unused-vars
 //   }
 //
 // });
+
+function initFirebase() {
+  // Initialize Firebase
+  const config = {
+    apiKey: "AIzaSyCdr0kpTbsED6du_p-RulO_m4L7aglFoio",
+    projectId: "letsbuildutopia-84770",
+    storageBucket: "letsbuildutopia-84770.appspot.com",
+  };
+  firebase.initializeApp(config);
+  console.info(`Firebase SDK ${firebase.SDK_VERSION}`);
+}
+
+function initCounters() {
+  const locale = 'de';
+  
+  // Population clock
+  document.addEventListener('DOMContentLoaded', () => {
+    const start = 7714100000;
+    const persecond = 2.62;
+    const date = new Date('2019-07-05');
+    const interval = 1000;
+    const el = document.querySelector('#count_total')
+    setInterval(() => {
+      let diff = Math.round( (new Date() - date)/1000 ) + 1;
+      let result = Math.round( diff * persecond + start );
+      el.textContent = Number(result).toLocaleString(locale);
+    }, interval);
+  });
+  
+  // Live Upload Count
+  document.addEventListener('DOMContentLoaded', () => {
+    let el = document.querySelector('#count_connected');
+    firebase.firestore().doc('_/stats').onSnapshot(doc => {
+      let count = doc.data().uploadCount;
+      if (count !== undefined) {
+        console.log(`Count updated: ${count}`);
+        el.textContent = Number(count).toLocaleString(locale);
+      }
+    });
+  });
+}
