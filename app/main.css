@@ -1,32 +1,40 @@
 .outercanvas {
   position: relative;
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
 }
 
 canvas {
-  /* display: inline-block; */
-  /* align-items: center; */
-  /* vertical-align: middle; */
-  /* overflow: hidden !important;
-  display: flex;
-  width: auto;
-  height: 100%;
-  pointer-events: none;
-  margin: auto; */
   position: relative;
   right: 50%;
   left: 50%;
-  min-width: 100%;
-  min-height: 100%;
-  width: auto;
-  height: auto;
+  height: 100vh;
+  width: auto !important;
   -ms-transform: translateX(-50%);/* translateY(-50%); */
   -moz-transform: translateX(-50%);/* translateY(-50%); */
   -webkit-transform: translateX(-50%);/* translateY(-50%); */
   transform: translateX(-50%);/* translateY(-50%); */
   background-size: cover;
-  max-width: 225%;
   pointer-events: none;
-  /* overflow: hidden; */
+}
+
+#count_connected {
+  font-size: 25px;
+}
+
+#count_total {
+  font-size: 25px;
+}
+
+.titleresize {
+  font-size: 30px;
+  font-weight: bold;
+}
+
+.textresize {
+  font-size: 20px;
+  font-weight: normal;
 }
 
 .credits {
@@ -67,6 +75,11 @@ canvas {
 
 .menutext:hover {
   color: #ff6666 !important;
+}
+
+#code {
+  font-family: "Ionicons", "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
+  letter-spacing: 3px;
 }
 
 @media only screen and (min-width: 760px) {
