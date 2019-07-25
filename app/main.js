@@ -46,7 +46,7 @@ function setup() {
 
   initFirebase();
   initCounters();
-  
+
   var request = new XMLHttpRequest();
   request.open("GET","./data/on_land_stream_001.json", false);
   request.send(null);
@@ -120,7 +120,7 @@ function showDots(){
       mesh.position.set(coordinates1[i].x, coordinates1[i].y, coordinates1[i].z);
       scene.add( mesh );
       numberDots++;
-    } 
+    }
   }
 }
 
@@ -291,7 +291,7 @@ function initFirebase() {
 
 function initCounters() {
   const locale = 'de';
-  
+
   // Population clock
   document.addEventListener('DOMContentLoaded', () => {
     const start = 7714100000;
@@ -305,7 +305,7 @@ function initCounters() {
       el.textContent = Number(result).toLocaleString(locale);
     }, interval);
   });
-  
+
   // Live Upload Count
   document.addEventListener('DOMContentLoaded', () => {
     let el = document.querySelector('#count_connected');
