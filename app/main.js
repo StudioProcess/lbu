@@ -46,6 +46,7 @@ function setup() {
 
   initFirebase();
   initCounters();
+  initUpload();
 
   var request = new XMLHttpRequest();
   request.open("GET","./data/on_land_stream_001.json", false);
@@ -316,5 +317,38 @@ function initCounters() {
         el.textContent = Number(count).toLocaleString(locale);
       }
     });
+  });
+}
+
+function initUpload() {
+  const digits = {
+    0: ['md-heart', '0xf308'],
+    1: ['ios-moon', '0xf468'],
+    2: ['md-flower', '0xf2f3'],
+    3: ['ios-star', '0xf4b3'],
+    4: ['ios-sunny', '0xf4b7'],
+    5: ['md-play', '0xf357'],
+    6: ['md-cloud', '0xf2c9'],
+    7: ['ios-square', '0xf21a'],
+    8: ['md-water', '0xf3a7'],
+    9: ['ios-happy', '0xf192'],
+  };
+
+  // Code entry
+  function characterForDigit(d) {
+    let hex = digits[d][1];
+    let cp= parseInt(hex, 16); // the 16 is not actually necessary when using hex formatted as 0xABCD
+    return String.fromCodePoint(cp);
+  }
+  const input = document.querySelector('#code');
+  const digitButtons = document.querySelectorAll('#keypad button[data-digit]');
+  const deleteButton = document.querySelector('#keypad button.delete');
+  digitButtons.forEach(el => {
+    el.addEventListener('click', e => {
+      input.value += characterForDigit(el.dataset.digit);
+    });
+  });
+  deleteButton.addEventListener('click', e => {
+    input.value = input.value.slice(0, -1);
   });
 }
