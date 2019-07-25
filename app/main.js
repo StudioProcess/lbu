@@ -117,13 +117,7 @@ function showDots(){
       mesh.position.set(coordinates1[i].x, coordinates1[i].y, coordinates1[i].z);
       scene.add( mesh );
       numberDots++;
-    } else {
-      // dotGeo = new THREE.SphereGeometry( objectSize/12, 5, 5 );
-      // mat = new THREE.MeshLambertMaterial({ color: 0xda4c40, flatShading: true });
-      // let mesh = new THREE.Mesh( dotGeo, mat );
-      // mesh.position.set(coordinates1[i].x, coordinates1[i].y, coordinates1[i].z);
-      // scene.add( mesh );
-    }
+    } 
   }
 }
 
