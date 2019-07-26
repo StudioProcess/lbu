@@ -71,6 +71,8 @@ canvas {
 
 .credits {
   padding-top: 2em;
+  padding-bottom: 2em;
+  text-align: center;
 }
 
 .row-info {
@@ -123,6 +125,7 @@ canvas {
     font-family: sans-serif;
     font-size: 20px;
     z-index: 1;
+    max-width: 250px;
   }
 
   .logonew {
