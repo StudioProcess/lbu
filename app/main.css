@@ -90,6 +90,11 @@ canvas {
   background-color: #fff;
 }
 
+.buttonsCode {
+  display: flex;
+  justify-content: space-between;
+}
+
 .image-upload {
   text-align: center;
   min-height: 500px !important;
