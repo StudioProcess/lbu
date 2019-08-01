@@ -20,7 +20,7 @@ let pathConnectionWidth = 0.19;
 
 let pointHistory = 5; // path ... maximum: 100
 
-let numberOfPoints = 321;
+let numberOfPoints = 6;
 
 let projectColors = [
   '#ce3b43',
