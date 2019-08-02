@@ -18,9 +18,9 @@ let objectSize = 1.7;
 let centerConnectionWidth = 0.11;
 let pathConnectionWidth = 0.19;
 
-let pointHistory = 25; // path ... maximum: 100
+let pointHistory = 5; // path ... maximum: 100
 
-let numberOfPoints = 6;
+let numberOfPoints = 8;
 
 let projectColors = [
   '#ce3b43',
@@ -79,7 +79,7 @@ function setup() {
   }
 
   renderer = new THREE.WebGLRenderer({
-    antialias: true,
+    antialias: false,
     alpha: true,
     preserveDrawingBuffer: true,
     canvas: document.querySelector("canvas")
@@ -246,6 +246,10 @@ function volumeConnect(){
 
 }
 
+function animateRandomPath() {
+  scene.children[getRndInteger(numberOfPoints*2, numberOfPoints*pointHistory)].material.opacity = getRndInteger(1,10)*0.1;
+}
+
 // always returns a random number between min and max (both included)
 function getRndInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1) ) + min;
@@ -259,10 +263,14 @@ function loop(time) { // eslint-disable-line no-unused-vars
   camera.position.x = Math.cos(speed) * 60;
   camera.position.z = Math.sin(speed) * 60;
 
+  animateRandomPath();
+
   camera.lookAt(scene.position);
 
   requestAnimationFrame( loop );
   renderer.render( scene, camera );
+
+  console.log( scene.children );
 }
 
 

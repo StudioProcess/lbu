@@ -76,6 +76,13 @@ canvas {
   justify-content: center;
 }
 
+.uploadbuttonmiddle {
+  display: flex;
+  align-items: center !important;
+  justify-content: center;
+
+}
+
 .titleresize {
   font-size: 35px;
   font-weight: bold;
