@@ -17,11 +17,11 @@ let splines = [];
 
 let objectSize = 1.7;
 let centerConnectionWidth = 0.11;
-let pathConnectionWidth = 0.29;
+let pathConnectionWidth = 0.5;
 
-let pointHistory = 10; // path ... maximum: 100
+let pointHistory = 5; // path ... maximum: 100
 
-let numberOfPoints = 8;
+let numberOfPoints = 321;
 
 var lines = [];
 var animateVisibility = true;
@@ -100,7 +100,7 @@ function setup() {
 
   showDots();
   // connectToCenter();
-  volumeConnect();
+  // volumeConnect();
   // connectPath();
   connectPathLine();
 
@@ -228,23 +228,24 @@ function connectPathLine(){
     }
     var line = new MeshLine();
 
-    line.setGeometry( geometry );//, function() { return pathConnectionWidth; } );//0.1 + Math.sin( 0.1 * p ); } ); //, function( p ) { return 2 + Math.sin( 50 * p ); } ); // makes width sinusoidal
+    line.setGeometry( geometry );
 
     var splineMat = new MeshLineMaterial( {
       color: new THREE.Color( projectColors[pointColorIndex[i]] ),
-      opacity: 1.0,
+      opacity: 0.8,
       sizeAttenuation: true,
       lineWidth: pathConnectionWidth,
-      near: camera.near,
-      far: camera.far,
       depthWrite: true,
       wireframe: false,
-      transparent: false,
-      side: THREE.DoubleSide
+      transparent: true,
+      side: THREE.DoubleSide,
+      dashArray: 2,     // always has to be the double of the line
+      dashOffset: -1,    // start the dash at zero
+      dashRatio: 0.2
     });
 
     let mesh = new THREE.Mesh( line.geometry, splineMat );
-
+    lines.push ( mesh );
     scene.add( mesh );
   }
 }
@@ -276,10 +277,8 @@ function volumeConnect(){
       let mesh = new THREE.Mesh( tubeGeometry, splineMat );
       // var wireframe = new THREE.Mesh( geometry, wireframeMaterial );
       // mesh.add( wireframe );
-
-      scene.add( mesh );
-
       lines.push ( mesh );
+      scene.add( mesh );
     }
   }
 
@@ -310,7 +309,14 @@ function loop(time) { // eslint-disable-line no-unused-vars
 
   requestAnimationFrame( loop );
 
+  // console.log ( lines[0] );
+
+  lines.forEach( function( l, i ) {
+		l.material.uniforms.dashOffset.value += 0.002; //? (time/3000) % 1.0 : 1.0;
+	} );
+
   renderer.render( scene, camera );
+
 
   // console.log( scene.children );
 }
