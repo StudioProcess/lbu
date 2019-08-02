@@ -18,7 +18,7 @@ let objectSize = 1.7;
 let centerConnectionWidth = 0.11;
 let pathConnectionWidth = 0.19;
 
-let pointHistory = 5; // path ... maximum: 100
+let pointHistory = 25; // path ... maximum: 100
 
 let numberOfPoints = 6;
 
