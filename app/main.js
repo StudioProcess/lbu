@@ -17,11 +17,14 @@ let splines = [];
 
 let objectSize = 1.7;
 let centerConnectionWidth = 0.11;
-let pathConnectionWidth = 0.19;
+let pathConnectionWidth = 0.29;
 
-let pointHistory = 5; // path ... maximum: 100
+let pointHistory = 10; // path ... maximum: 100
 
 let numberOfPoints = 8;
+
+var lines = [];
+var animateVisibility = true;
 
 let projectColors = [
   '#ce3b43',
@@ -98,7 +101,8 @@ function setup() {
   showDots();
   // connectToCenter();
   volumeConnect();
-  connectPath();
+  // connectPath();
+  connectPathLine();
 
   // lights
   var ambientLight = new THREE.AmbientLight( 0x404040, 5 ); // soft white light
@@ -117,7 +121,7 @@ function showDots(){
       dotGeo = new THREE.SphereGeometry( objectSize/4, 5, 5 );
       // let randColorIndex = getRndInteger(0, projectColors.length-2);
       // console.log(pointColorIndex[numberDots]);
-      mat = new THREE.MeshLambertMaterial({ color: projectColors[pointColorIndex[numberDots]], flatShading: true, transparent: true, opacity: 0.8 });
+      mat = new THREE.MeshLambertMaterial({ color: projectColors[pointColorIndex[numberDots]], flatShading: true, transparent: false, opacity: 1.0 });
       let mesh = new THREE.Mesh( dotGeo, mat );
       mesh.position.set(coordinates1[i].x, coordinates1[i].y, coordinates1[i].z);
       scene.add( mesh );
@@ -212,6 +216,39 @@ function connectPath(){
   }
 }
 
+function connectPathLine(){
+  for(let i = 0; i < numberOfPoints; i++) {
+    let geometry = new THREE.Geometry();
+    for(let u = 0; u < pointHistory; u++) {
+      geometry.vertices.push( new THREE.Vector3(
+        coordinates1[i*pointHistory+u].x,
+        coordinates1[i*pointHistory+u].y,
+        coordinates1[i*pointHistory+u].z
+      ) );
+    }
+    var line = new MeshLine();
+
+    line.setGeometry( geometry );//, function() { return pathConnectionWidth; } );//0.1 + Math.sin( 0.1 * p ); } ); //, function( p ) { return 2 + Math.sin( 50 * p ); } ); // makes width sinusoidal
+
+    var splineMat = new MeshLineMaterial( {
+      color: new THREE.Color( projectColors[pointColorIndex[i]] ),
+      opacity: 1.0,
+      sizeAttenuation: true,
+      lineWidth: pathConnectionWidth,
+      near: camera.near,
+      far: camera.far,
+      depthWrite: true,
+      wireframe: false,
+      transparent: false,
+      side: THREE.DoubleSide
+    });
+
+    let mesh = new THREE.Mesh( line.geometry, splineMat );
+
+    scene.add( mesh );
+  }
+}
+
 function volumeConnect(){
   // https://threejs.org/examples/#webgl_geometry_extrude_splines
 
@@ -239,7 +276,10 @@ function volumeConnect(){
       let mesh = new THREE.Mesh( tubeGeometry, splineMat );
       // var wireframe = new THREE.Mesh( geometry, wireframeMaterial );
       // mesh.add( wireframe );
+
       scene.add( mesh );
+
+      lines.push ( mesh );
     }
   }
 
@@ -264,14 +304,15 @@ function loop(time) { // eslint-disable-line no-unused-vars
   camera.position.x = Math.cos(speed) * 60;
   camera.position.z = Math.sin(speed) * 60;
 
-  animateRandomPath();
+  // animateRandomPath();
 
   camera.lookAt(scene.position);
 
   requestAnimationFrame( loop );
+
   renderer.render( scene, camera );
 
-  console.log( scene.children );
+  // console.log( scene.children );
 }
 
 
