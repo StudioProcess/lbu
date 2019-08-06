@@ -338,14 +338,14 @@ function loop(time) { // eslint-disable-line no-unused-vars
       // l.material.uniforms.visibility.value = i ? (time/3000) % 1.0 : 1.0;
       // l.material.uniforms.dashOffset.value = Math.sin(i) + (time/(10*i));
       // l.material.uniforms.visibility.value = (Math.sin(i) + (time/(10*i)) % 1.0);
-      l.material.uniforms.visibility.value= (time/3000) % 1.0;
+      l.material.uniforms.visibility.value = Math.sin(time/(6000-i*2));// % 1.0;
       // l.material.uniforms.dashOffset.value -= 0.01;
     }
   } );
 
   lines.forEach( function( l, i ) {
     if (i <= numberOfPoints) {
-      l.material.uniforms.visibility.value= (time/3000) % 1.0;
+      l.material.uniforms.visibility.value = Math.cos(time/(3000-i));// % 1.0;
       // l.material.uniforms.dashOffset.value -= 0.01;
     }
   } );
