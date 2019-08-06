@@ -100,7 +100,7 @@ function setup() {
 
   showDots();
   // connectToCenter();
-  // volumeConnect();
+  volumeConnect();
   // connectPath();
   connectPathLine();
 
@@ -265,20 +265,43 @@ function volumeConnect(){
       var midpointY = (coordinates1[i].y+centerY)/2;
       var midpointZ = (coordinates1[i].z+centerZ)/2;
 
-      var spline = new THREE.QuadraticBezierCurve3(
-        new THREE.Vector3( coordinates1[i].x, coordinates1[i].y, coordinates1[i].z ),
-        new THREE.Vector3( midpointX, midpointY, midpointZ ),
-        new THREE.Vector3( centerX, centerY, centerZ )
-      );
+      var geometry = new THREE.Geometry();
 
-      splines.push ( spline );
-      var tubeGeometry = new THREE.TubeBufferGeometry( spline, 4, centerConnectionWidth, 4, false );
+      geometry.vertices.push( new THREE.Vector3( coordinates1[i].x, coordinates1[i].y, coordinates1[i].z ) );
+      geometry.vertices.push( new THREE.Vector3( midpointX, midpointY, midpointZ ) );
+      geometry.vertices.push( new THREE.Vector3( centerX, centerY, centerZ ) );
 
-      let mesh = new THREE.Mesh( tubeGeometry, splineMat );
+      // splines.push ( spline );
+      // var tubeGeometry = new THREE.TubeBufferGeometry( spline, 4, centerConnectionWidth, 4, false );
+
+      // let mesh = new THREE.Mesh( tubeGeometry, splineMat );
       // var wireframe = new THREE.Mesh( geometry, wireframeMaterial );
       // mesh.add( wireframe );
+      // lines.push ( mesh );
+      // scene.add( mesh );
+
+      var line = new MeshLine();
+
+      line.setGeometry( geometry );
+
+      var centerMat = new MeshLineMaterial( {
+        color: new THREE.Color( 0xffffff ),
+        opacity: 0.5,
+        sizeAttenuation: true,
+        lineWidth: centerConnectionWidth,
+        depthWrite: true,
+        wireframe: false,
+        transparent: true,
+        side: THREE.DoubleSide,
+        dashArray: 2,     // always has to be the double of the line
+        dashOffset: -1,    // start the dash at zero
+        dashRatio: 0.2
+      });
+
+      let mesh = new THREE.Mesh( line.geometry, centerMat );
       lines.push ( mesh );
       scene.add( mesh );
+
     }
   }
 
@@ -310,10 +333,25 @@ function loop(time) { // eslint-disable-line no-unused-vars
   requestAnimationFrame( loop );
 
   // console.log ( lines[0] );
+  lines.forEach( function( l, i ) {
+    if (i > numberOfPoints) {
+      // l.material.uniforms.visibility.value = i ? (time/3000) % 1.0 : 1.0;
+      // l.material.uniforms.dashOffset.value = Math.sin(i) + (time/(10*i));
+      // l.material.uniforms.visibility.value = (Math.sin(i) + (time/(10*i)) % 1.0);
+      l.material.uniforms.visibility.value= (time/3000) % 1.0;
+      // l.material.uniforms.dashOffset.value -= 0.01;
+    }
+  } );
 
   lines.forEach( function( l, i ) {
-		l.material.uniforms.dashOffset.value += 0.002; //? (time/3000) % 1.0 : 1.0;
-	} );
+    if (i <= numberOfPoints) {
+      l.material.uniforms.visibility.value= (time/3000) % 1.0;
+      // l.material.uniforms.dashOffset.value -= 0.01;
+    }
+  } );
+
+  // lines[getRndInteger(1, lines.length)].material.uniforms.dashOffset.value = 0.002; //? (time/3000) % 1.0 : 1.0;
+
 
   renderer.render( scene, camera );
 
