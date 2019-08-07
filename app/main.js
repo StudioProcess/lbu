@@ -13,11 +13,11 @@ let controls; // eslint-disable-line no-unused-vars
 
 let coordinates1 = [];
 
-let splines = [];
+let dots = [];
 
-let objectSize = 1.7;
-let centerConnectionWidth = 0.11;
-let pathConnectionWidth = 0.5;
+let objectSize = 1.0;
+let centerConnectionWidth = 1.11;
+let pathConnectionWidth = 6.5;
 
 let pointHistory = 5; // path ... maximum: 100
 
@@ -25,6 +25,8 @@ let numberOfPoints = 321;
 
 var lines = [];
 var animateVisibility = true;
+
+var resolution = new THREE.Vector2( window.innerWidth, window.innerHeight );
 
 let projectColors = [
   '#ce3b43',
@@ -37,7 +39,27 @@ let projectColors = [
   '#ccf0fd'
 ];
 
+var Params = function() {
+  this.curves = true;
+  this.circles = false;
+  this.amount = 100;
+  this.lineWidth = pathConnectionWidth;
+  this.dashArray = 0.0;
+  this.dashOffset = 0;
+  this.dashRatio = 0.5;
+  this.taper = 'parabolic';
+  this.strokes = false;
+  this.sizeAttenuation = false;
+  this.animateWidth = false;
+  this.spread = false;
+  this.autoRotate = true;
+  this.autoUpdate = true;
+  this.animateVisibility = false;
+  this.animateDashOffset = false;
+};
+
 let pointColorIndex = [];
+var params = new Params();
 
 (function main() {
 
@@ -99,16 +121,14 @@ function setup() {
   camera.position.z = 70;
 
   showDots();
-  // connectToCenter();
   volumeConnect();
-  // connectPath();
   connectPathLine();
 
   // lights
-  var ambientLight = new THREE.AmbientLight( 0x404040, 5 ); // soft white light
+  // var ambientLight = new THREE.AmbientLight( 0x404040, 5 ); // soft white light
   // var directionalLight = new THREE.PointLight( 0xffffff, 20, 50 );
   // scene.add( directionalLight );
-  scene.add( ambientLight );
+  // scene.add( ambientLight );
 }
 
 function showDots(){
@@ -121,98 +141,35 @@ function showDots(){
       dotGeo = new THREE.SphereGeometry( objectSize/4, 5, 5 );
       // let randColorIndex = getRndInteger(0, projectColors.length-2);
       // console.log(pointColorIndex[numberDots]);
-      mat = new THREE.MeshLambertMaterial({ color: projectColors[pointColorIndex[numberDots]], flatShading: true, transparent: false, opacity: 1.0 });
+      // mat = new THREE.MeshLambertMaterial({ color: projectColors[pointColorIndex[numberDots]], flatShading: true, transparent: false, opacity: 1.0 });
+
+      mat = new MeshLineMaterial( {
+        // map: strokeTexture,
+        useMap: params.strokes,
+        color: new THREE.Color( projectColors[pointColorIndex[numberDots]] ),
+        opacity: params.strokes ? .5 : 1,
+        dashArray: params.dashArray,
+        dashOffset: params.dashOffset,
+        dashRatio: params.dashRatio,
+        resolution: resolution,
+        sizeAttenuation: params.sizeAttenuation,
+        lineWidth: centerConnectionWidth,
+        near: camera.near,
+        far: camera.far,
+        depthWrite: false,
+        depthTest: !params.strokes,
+        alphaTest: .5,//params.strokes ? .5 : 0,
+        transparent: true,
+        side: THREE.DoubleSide
+    });
+
+
       let mesh = new THREE.Mesh( dotGeo, mat );
       mesh.position.set(coordinates1[i].x, coordinates1[i].y, coordinates1[i].z);
+      dots.push( mesh );
       scene.add( mesh );
       numberDots++;
     }
-  }
-}
-
-function connectToCenter(){
-  for(let i = 0; i < coordinates1.length; i++){
-    let connectionMat = new THREE.LineBasicMaterial( { color: 0x1e90ff } );
-
-    var geometry = new THREE.Geometry();
-    geometry.vertices.push(new THREE.Vector3(0, 0, 0) );
-    geometry.vertices.push(new THREE.Vector3( coordinates1[i].x, coordinates1[i].y, coordinates1[i].z) );
-
-    var line = new THREE.Line( geometry, connectionMat );
-    scene.add( line );
-  }
-}
-
-
-function connectPath(){
-  let first = true;
-
-  // let splineMat = new THREE.MeshLambertMaterial( { color: 0xedbe00, flatShading: false, wireframe: false, transparent: true, opacity: 0.8 } );
-
-  var startX;
-  var startY;
-  var startZ;
-
-  var endPointX;
-  var endPointY;
-  var endPointZ;
-
-  for(let i = 0; i < numberOfPoints; i++){
-    first = true;
-    for(let u = 0; u < pointHistory-1; u++) { // for each path segment
-
-      if(u==0){
-        startX = coordinates1[i*pointHistory+u].x;
-        startY = coordinates1[i*pointHistory+u].y;
-        startZ = coordinates1[i*pointHistory+u].z;
-
-        endPointX = coordinates1[i*pointHistory+u+1].x;
-        endPointY = coordinates1[i*pointHistory+u+1].y;
-        endPointZ = coordinates1[i*pointHistory+u+1].z;
-      } else if(u==pointHistory-2) {
-        startX = coordinates1[i*pointHistory+u].x;
-        startY = coordinates1[i*pointHistory+u].y;
-        startZ = coordinates1[i*pointHistory+u].z;
-
-        endPointX = coordinates1[i*pointHistory+u+1].x;
-        endPointY = coordinates1[i*pointHistory+u+1].y;
-        endPointZ = coordinates1[i*pointHistory+u+1].z;
-
-        // console.log("last");
-      } else {
-        startX = coordinates1[i*pointHistory+u].x;
-        startY = coordinates1[i*pointHistory+u].y;
-        startZ = coordinates1[i*pointHistory+u].z;
-
-        endPointX = coordinates1[i*pointHistory+u+1].x;
-        endPointY = coordinates1[i*pointHistory+u+1].y;
-        endPointZ = coordinates1[i*pointHistory+u+1].z;
-      }
-
-      var midpointX = (startX+endPointX)/2;
-      var midpointY = (startY+endPointY)/2;
-      var midpointZ = (startZ+endPointZ)/2;
-
-      var spline = new THREE.QuadraticBezierCurve3(
-        new THREE.Vector3( startX, startY, startZ ),
-        new THREE.Vector3( midpointX, midpointY, midpointZ ),
-        new THREE.Vector3( endPointX, endPointY, endPointZ )
-      );
-
-      splines.push ( spline );
-      var tubeGeometry = new THREE.TubeBufferGeometry( spline, 4, pathConnectionWidth, 4, false );
-
-      // let randColorIndex = getRndInteger(0, projectColors.length-2);
-      let splineMat = new THREE.MeshLambertMaterial( { color: projectColors[pointColorIndex[i]], flatShading: false, wireframe: false, transparent: true, opacity: 0.8 } );
-
-      let mesh = new THREE.Mesh( tubeGeometry, splineMat );
-      // var wireframe = new THREE.Mesh( geometry, wireframeMaterial );
-      // mesh.add( wireframe );
-      // console.log( spline );
-      scene.add( mesh );
-    }
-    // i+=pointHistory;
-    first = false;
   }
 }
 
@@ -230,19 +187,39 @@ function connectPathLine(){
 
     line.setGeometry( geometry );
 
+    // var splineMat = new MeshLineMaterial( {
+    //   color: new THREE.Color( projectColors[pointColorIndex[i]] ),
+    //   opacity: 0.8,
+    //   sizeAttenuation: true,
+    //   lineWidth: pathConnectionWidth,
+    //   depthWrite: true,
+    //   wireframe: false,
+    //   transparent: true,
+    //   side: THREE.DoubleSide,
+    //   dashArray: 2,     // always has to be the double of the line
+    //   dashOffset: -1,    // start the dash at zero
+    //   dashRatio: 0.2
+    // });
+
     var splineMat = new MeshLineMaterial( {
+      // map: strokeTexture,
+      useMap: params.strokes,
       color: new THREE.Color( projectColors[pointColorIndex[i]] ),
-      opacity: 0.8,
-      sizeAttenuation: true,
-      lineWidth: pathConnectionWidth,
-      depthWrite: true,
-      wireframe: false,
+      opacity: 0.9,//params.strokes ? .5 : 1,
+      dashArray: params.dashArray,
+      dashOffset: params.dashOffset,
+      dashRatio: params.dashRatio,
+      resolution: resolution,
+      sizeAttenuation: params.sizeAttenuation,
+      lineWidth: params.lineWidth,
+      near: camera.near,
+      far: camera.far,
+      depthWrite: false,
+      depthTest: !params.strokes,
+      alphaTest: params.strokes ? .5 : 0,
       transparent: true,
-      side: THREE.DoubleSide,
-      dashArray: 2,     // always has to be the double of the line
-      dashOffset: -1,    // start the dash at zero
-      dashRatio: 0.2
-    });
+      side: THREE.DoubleSide
+	});
 
     let mesh = new THREE.Mesh( line.geometry, splineMat );
     lines.push ( mesh );
@@ -251,9 +228,8 @@ function connectPathLine(){
 }
 
 function volumeConnect(){
-  // https://threejs.org/examples/#webgl_geometry_extrude_splines
 
-  let splineMat = new THREE.MeshLambertMaterial( { color: 0xccf0fd, flatShading: false, wireframe: false, transparent: true, opacity: 0.8 } );
+  // let splineMat = new THREE.MeshLambertMaterial( { color: 0xccf0fd, flatShading: false, wireframe: false, transparent: true, opacity: 0.8 } );
   var centerX = 0;
   var centerY = 0;
   var centerZ = 0;
@@ -284,19 +260,39 @@ function volumeConnect(){
 
       line.setGeometry( geometry );
 
+      // var centerMat = new MeshLineMaterial( {
+      //   color: new THREE.Color( 0xffffff ),
+      //   opacity: 0.5,
+      //   sizeAttenuation: true,
+      //   lineWidth: centerConnectionWidth,
+      //   depthWrite: true,
+      //   wireframe: false,
+      //   transparent: true,
+      //   side: THREE.DoubleSide,
+      //   dashArray: 2,     // always has to be the double of the line
+      //   dashOffset: -1,    // start the dash at zero
+      //   dashRatio: 0.2
+      // });
+
       var centerMat = new MeshLineMaterial( {
+        // map: strokeTexture,
+        useMap: params.strokes,
         color: new THREE.Color( 0xffffff ),
-        opacity: 0.5,
-        sizeAttenuation: true,
+        opacity: params.strokes ? .5 : 1,
+        dashArray: params.dashArray,
+        dashOffset: params.dashOffset,
+        dashRatio: params.dashRatio,
+        resolution: resolution,
+        sizeAttenuation: params.sizeAttenuation,
         lineWidth: centerConnectionWidth,
-        depthWrite: true,
-        wireframe: false,
+        near: camera.near,
+        far: camera.far,
+        depthWrite: false,
+        depthTest: !params.strokes,
+        alphaTest: .5,//params.strokes ? .5 : 0,
         transparent: true,
-        side: THREE.DoubleSide,
-        dashArray: 2,     // always has to be the double of the line
-        dashOffset: -1,    // start the dash at zero
-        dashRatio: 0.2
-      });
+        side: THREE.DoubleSide
+    });
 
       let mesh = new THREE.Mesh( line.geometry, centerMat );
       lines.push ( mesh );
@@ -332,23 +328,28 @@ function loop(time) { // eslint-disable-line no-unused-vars
 
   requestAnimationFrame( loop );
 
-  // console.log ( lines[0] );
+  // animation connections
   lines.forEach( function( l, i ) {
     if (i > numberOfPoints) {
-      // l.material.uniforms.visibility.value = i ? (time/3000) % 1.0 : 1.0;
-      // l.material.uniforms.dashOffset.value = Math.sin(i) + (time/(10*i));
-      // l.material.uniforms.visibility.value = (Math.sin(i) + (time/(10*i)) % 1.0);
       l.material.uniforms.visibility.value = Math.sin(time/(6000-i*2));// % 1.0;
-      // l.material.uniforms.dashOffset.value -= 0.01;
     }
   } );
 
+  // // animation dots
+  // dots.forEach( function( l, i ) {
+  //   l.radius = 2.0 + i*10;
+  // } );
+
+  // console.log ( dots );
+
+  // animation centerConnection
   lines.forEach( function( l, i ) {
     if (i <= numberOfPoints) {
-      l.material.uniforms.visibility.value = Math.cos(time/(3000-i));// % 1.0;
-      // l.material.uniforms.dashOffset.value -= 0.01;
+      l.material.uniforms.visibility.value = Math.cos(time/(6000-i));// % 1.0;
     }
   } );
+  // console.log(time);
+
 
   // lines[getRndInteger(1, lines.length)].material.uniforms.dashOffset.value = 0.002; //? (time/3000) % 1.0 : 1.0;
 
