@@ -42,12 +42,14 @@ canvas {
   background: #fff;
   color: #000;
   margin: 5px;
-  padding-left: 30px;
-  padding-right: 30px;
+  /* padding-left: 30px;
+  padding-right: 30px; */
   line-height: 70px;
   font-weight: bold;
   font-size: 50px;
   text-align: center;
+  width: 1.5em;
+  height: 1.5em;
 }
 
 .icon:hover {
