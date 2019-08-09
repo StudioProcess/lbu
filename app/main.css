@@ -165,6 +165,9 @@ canvas {
   justify-content: center;
   display: flex;
   cursor: pointer;
+  background-image: url('../assets/photos/placeholder_photo.png') !important;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .image-upload:hover {

@@ -120,7 +120,7 @@ function setup() {
   controls = new OrbitControls( camera, renderer.domElement );
   camera.position.z = 70;
 
-  showDots();
+  // showDots();
   volumeConnect();
   connectPathLine();
 
@@ -387,10 +387,10 @@ function initLibrary() {
 function initPageElements() {
   // population clock
   lbu.setupPopCounter({ selector: '#count_total', interval: 1000 });
-  
+
   // live upload count
   lbu.setupUploadCounter({ selector: '#count_connected' });
-  
+
   // code entry
   lbu.setupCodeEntry({ code_input: '#code', digit_buttons: '#keypad button[data-digit]', delete_button: '#keypad button.delete' });
 }
