@@ -2,6 +2,7 @@ import * as THREE from '../node_modules/three/build/three.module.js';
 import { OrbitControls } from '../node_modules/three/examples/jsm/controls/OrbitControls.js';
 import { MeshLine, MeshLineMaterial } from './THREE.MeshLine.module.js';
 import * as util from './util.js';
+import * as lbu from './lbu.js';
 // import * as data from '../data/random_on_land_000.json';
 
 const W = 1280;
@@ -70,9 +71,8 @@ var params = new Params();
 
 function setup() {
 
-  initFirebase();
-  initCounters();
-  initUpload();
+  initLibrary();
+  initPageElements();
 
   var request = new XMLHttpRequest();
   request.open("GET","./data/on_land_stream_001.json", false);
@@ -374,76 +374,23 @@ function loop(time) { // eslint-disable-line no-unused-vars
 //
 // });
 
-function initFirebase() {
-  // Initialize Firebase
+function initLibrary() {
+  // Initialize LBU Library
   const config = {
     apiKey: "AIzaSyCdr0kpTbsED6du_p-RulO_m4L7aglFoio",
     projectId: "letsbuildutopia-84770",
     storageBucket: "letsbuildutopia-84770.appspot.com",
   };
-  firebase.initializeApp(config);
-  console.info(`Firebase SDK ${firebase.SDK_VERSION}`);
+  lbu.init(config);
 }
 
-function initCounters() {
-  const locale = 'de';
-
-  // Population clock
-  document.addEventListener('DOMContentLoaded', () => {
-    const start = 7714100000;
-    const persecond = 2.62;
-    const date = new Date('2019-07-05');
-    const interval = 1000;
-    const el = document.querySelector('#count_total')
-    setInterval(() => {
-      let diff = Math.round( (new Date() - date)/1000 ) + 1;
-      let result = Math.round( diff * persecond + start );
-      el.textContent = Number(result).toLocaleString(locale);
-    }, interval);
-  });
-
-  // Live Upload Count
-  document.addEventListener('DOMContentLoaded', () => {
-    let el = document.querySelector('#count_connected');
-    firebase.firestore().doc('_/stats').onSnapshot(doc => {
-      let count = doc.data().uploadCount;
-      if (count !== undefined) {
-        console.log(`Count updated: ${count}`);
-        el.textContent = Number(count).toLocaleString(locale);
-      }
-    });
-  });
-}
-
-function initUpload() {
-  const digits = {
-    0: ['md-heart', '0xf308'],
-    1: ['ios-moon', '0xf468'],
-    2: ['md-flower', '0xf2f3'],
-    3: ['ios-star', '0xf4b3'],
-    4: ['ios-sunny', '0xf4b7'],
-    5: ['md-play', '0xf357'],
-    6: ['md-cloud', '0xf2c9'],
-    7: ['ios-square', '0xf21a'],
-    8: ['md-water', '0xf3a7'],
-    9: ['ios-happy', '0xf192'],
-  };
-
-  // Code entry
-  function characterForDigit(d) {
-    let hex = digits[d][1];
-    let cp= parseInt(hex, 16); // the 16 is not actually necessary when using hex formatted as 0xABCD
-    return String.fromCodePoint(cp);
-  }
-  const input = document.querySelector('#code');
-  const digitButtons = document.querySelectorAll('#keypad button[data-digit]');
-  const deleteButton = document.querySelector('#keypad button.delete');
-  digitButtons.forEach(el => {
-    el.addEventListener('click', e => {
-      input.value += characterForDigit(el.dataset.digit);
-    });
-  });
-  deleteButton.addEventListener('click', e => {
-    input.value = input.value.slice(0, -1);
-  });
+function initPageElements() {
+  // population clock
+  lbu.setupPopCounter({ selector: '#count_total', interval: 1000 });
+  
+  // live upload count
+  lbu.setupUploadCounter({ selector: '#count_connected' });
+  
+  // code entry
+  lbu.setupCodeEntry({ code_input: '#code', digit_buttons: '#keypad button[data-digit]', delete_button: '#keypad button.delete' });
 }
