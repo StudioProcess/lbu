@@ -22,24 +22,13 @@ let pathConnectionWidth = 6.5;
 
 let pointHistory = 5; // path ... maximum: 100
 
-let numberOfPoints = 321;
-
+let numberOfPoints;
 var lines = [];
-var animateVisibility = true;
-
 var resolution = new THREE.Vector2( window.innerWidth, window.innerHeight );
 
-let projectColors = [
-  '#ce3b43',
-  '#2452c2',
-  '#f2c200',
-  '#b94db3',
-  '#9bcfe4',
-  '#b7b5a8',
-  '#1e1e1a',
-  '#ccf0fd'
-];
+let projectColors = [ '#ce3b43', '#2452c2', '#f2c200', '#b94db3', '#9bcfe4', '#b7b5a8', '#CCCCCC', '#ccf0fd'];
 
+let pointColorIndex = [];
 var Params = function() {
   this.curves = true;
   this.circles = false;
@@ -58,21 +47,22 @@ var Params = function() {
   this.animateVisibility = false;
   this.animateDashOffset = false;
 };
-
-let pointColorIndex = [];
 var params = new Params();
 
-(function main() {
+(async function main() {
 
-  setup(); // set up scene
+  await setup(); // set up scene
   loop(); // start game loop
 
 })();
 
-function setup() {
+async function setup() {
 
   initLibrary();
   initPageElements();
+
+  let data = await lbu.onData(() => {});
+  numberOfPoints = Object.keys(data.integrated).length; // set total number of visualized paths
 
   var request = new XMLHttpRequest();
   request.open("GET","./data/on_land_stream_001.json", false);
@@ -121,14 +111,94 @@ function setup() {
   camera.position.z = 70;
 
   // showDots();
-  volumeConnect();
-  connectPathLine();
+  // volumeConnect();
+  // connectPathLine();
+
+  createTravelledPaths();
+  showLastPositionAsDots();
+  connectToCenter();
 
   // lights
   // var ambientLight = new THREE.AmbientLight( 0x404040, 5 ); // soft white light
   // var directionalLight = new THREE.PointLight( 0xffffff, 20, 50 );
   // scene.add( directionalLight );
   // scene.add( ambientLight );
+
+  lbu.onData( ( data ) => {
+    // console.log( data );
+    // console.log( Object.keys(data.integrated).length ); // number of current paths in dataset
+    // console.log( data.updated ); // last updated path
+    // console.log( data.integrated[data.updated] ); // stream of points of last updated path
+    // console.log( data.integrated ); // current data
+
+  });
+
+}
+
+function showLastPositionAsDots() {
+  lbu.onData( ( data ) => {
+    // console.log( data );
+    // console.log( Object.keys(data.integrated).length ); // number of current paths in dataset
+    // console.log( data.updated ); // last updated path
+    // console.log( data.integrated[data.updated] ); // stream of points of last updated path
+    // console.log( data.integrated ); // current data
+
+    for (let key of Object.keys(data.integrated)) {
+      let points = data.integrated[key];
+      let dotGeo = null;
+      let mat = null;
+
+      dotGeo = new THREE.SphereGeometry( objectSize/4, 5, 5 );
+
+      for (let i = 0; i < points.length; i++) {
+
+        // console.log ( points.length );
+
+        let lat = points[i];
+        let lon = points[i+1];
+
+        var cosLat = Math.cos(lat * Math.PI / 180.0);
+        var sinLat = Math.sin(lat * Math.PI / 180.0);
+        var cosLon = Math.cos(lon * Math.PI / 180.0);
+        var sinLon = Math.sin(lon * Math.PI / 180.0);
+        var rad = 40.0;
+        let x = rad * cosLat * cosLon;
+        let y = rad * cosLat * sinLon;
+        let z = rad * sinLat;
+
+        // console.log( "x: "+x+" y: "+" z: "+z );
+
+        mat = new MeshLineMaterial( {
+          // map: strokeTexture,
+          useMap: params.strokes,
+          color: new THREE.Color( projectColors[0] ),
+          opacity: params.strokes ? .5 : 1,
+          dashArray: params.dashArray,
+          dashOffset: params.dashOffset,
+          dashRatio: params.dashRatio,
+          resolution: resolution,
+          sizeAttenuation: params.sizeAttenuation,
+          lineWidth: centerConnectionWidth,
+          near: camera.near,
+          far: camera.far,
+          depthWrite: false,
+          depthTest: !params.strokes,
+          alphaTest: .5,//params.strokes ? .5 : 0,
+          transparent: true,
+          side: THREE.DoubleSide
+      });
+
+        let mesh = new THREE.Mesh( dotGeo, mat );
+        mesh.position.set(x, y, z);
+        dots.push( mesh );
+        scene.add( mesh );
+
+        // console.log("mesh: "+mesh);
+        i++;
+      }
+    }
+
+  });
 }
 
 function showDots(){
@@ -171,6 +241,77 @@ function showDots(){
       numberDots++;
     }
   }
+}
+
+function createTravelledPaths(){
+
+  lbu.onData( ( data ) => {
+    // console.log( data );
+    // console.log( Object.keys(data.integrated).length ); // number of current paths in dataset
+    // console.log( data.updated ); // last updated path
+    // console.log( data.integrated[data.updated] ); // stream of points of last updated path
+    // console.log( data.integrated ); // current data
+
+    // console.log( data.integrated );
+
+    for (let key of Object.keys(data.integrated)) {
+      let points = data.integrated[key];
+      var line = new MeshLine();
+      let geometry = new THREE.Geometry();
+
+      for (let i = 0; i < points.length; i++) {
+
+        // console.log ( points.length );
+
+        let lat = points[i];
+        let lon = points[i+1];
+
+        var cosLat = Math.cos(lat * Math.PI / 180.0);
+        var sinLat = Math.sin(lat * Math.PI / 180.0);
+        var cosLon = Math.cos(lon * Math.PI / 180.0);
+        var sinLon = Math.sin(lon * Math.PI / 180.0);
+        var rad = 40.0;
+        let x = rad * cosLat * cosLon;
+        let y = rad * cosLat * sinLon;
+        let z = rad * sinLat;
+
+        // console.log( "x: "+x+" y: "+" z: "+z );
+
+        geometry.vertices.push( new THREE.Vector3( x, y, z) );
+
+        // console.log("mesh: "+mesh);
+        i++;
+      }
+
+
+      line.setGeometry( geometry );
+
+      var splineMat = new MeshLineMaterial( {
+        // map: strokeTexture,
+        useMap: params.strokes,
+        color: new THREE.Color( projectColors[2] ),
+        opacity: 0.9,//params.strokes ? .5 : 1,
+        dashArray: params.dashArray,
+        dashOffset: params.dashOffset,
+        dashRatio: params.dashRatio,
+        resolution: resolution,
+        sizeAttenuation: params.sizeAttenuation,
+        lineWidth: params.lineWidth,
+        near: camera.near,
+        far: camera.far,
+        depthWrite: false,
+        depthTest: !params.strokes,
+        alphaTest: params.strokes ? .5 : 0,
+        transparent: true,
+        side: THREE.DoubleSide
+      });
+
+      let mesh = new THREE.Mesh( line.geometry, splineMat );
+      lines.push ( mesh );
+      scene.add( mesh );
+    }
+
+  });
 }
 
 function connectPathLine(){
@@ -305,6 +446,71 @@ function volumeConnect(){
 
 }
 
+function connectToCenter() {
+  lbu.onData( ( data ) => {
+    // console.log( data );
+    // console.log( Object.keys(data.integrated).length ); // number of current paths in dataset
+    // console.log( data.updated ); // last updated path
+    // console.log( data.integrated[data.updated] ); // stream of points of last updated path
+    // console.log( data.integrated ); // current data
+
+    // console.log( data.integrated );
+
+    for (let key of Object.keys(data.integrated)) {
+      let points = data.integrated[key];
+      var line = new MeshLine();
+      let geometry = new THREE.Geometry();
+
+      let lat = points[points.length-2];
+      let lon = points[points.length-1];
+
+      var cosLat = Math.cos(lat * Math.PI / 180.0);
+      var sinLat = Math.sin(lat * Math.PI / 180.0);
+      var cosLon = Math.cos(lon * Math.PI / 180.0);
+      var sinLon = Math.sin(lon * Math.PI / 180.0);
+      var rad = 40.0;
+      let x = rad * cosLat * cosLon;
+      let y = rad * cosLat * sinLon;
+      let z = rad * sinLat;
+
+      let center = new THREE.Vector3( 0, 0, 0);
+      let point = new THREE.Vector3( x, y, z);
+
+      console.log("from: "+center.x+" "+center.y+" "+center.z+" to: "+point.x+" "+point.y+" "+point.z);
+
+      geometry.vertices.push( center );
+      geometry.vertices.push( point );
+
+      line.setGeometry( geometry );
+
+      var splineMat = new MeshLineMaterial( {
+        // map: strokeTexture,
+        useMap: params.strokes,
+        color: new THREE.Color( projectColors[0] ),
+        opacity: 0.9,//params.strokes ? .5 : 1,
+        dashArray: params.dashArray,
+        dashOffset: params.dashOffset,
+        dashRatio: params.dashRatio,
+        resolution: resolution,
+        sizeAttenuation: params.sizeAttenuation,
+        lineWidth: centerConnectionWidth,
+        near: camera.near,
+        far: camera.far,
+        depthWrite: false,
+        depthTest: !params.strokes,
+        alphaTest: params.strokes ? .5 : 0,
+        transparent: true,
+        side: THREE.DoubleSide
+      });
+
+      let mesh = new THREE.Mesh( line.geometry, splineMat );
+      lines.push ( mesh );
+      scene.add( mesh );
+    }
+
+  });
+}
+
 function animateRandomPath() {
   scene.children[getRndInteger(numberOfPoints*2, numberOfPoints*pointHistory)].material.opacity = getRndInteger(1,10)*0.1;
 }
@@ -328,31 +534,19 @@ function loop(time) { // eslint-disable-line no-unused-vars
 
   requestAnimationFrame( loop );
 
-  // animation connections
-  lines.forEach( function( l, i ) {
-    if (i > numberOfPoints) {
-      l.material.uniforms.visibility.value = Math.sin(time/(6000-i*2));// % 1.0;
-    }
-  } );
-
   // // animation dots
   // dots.forEach( function( l, i ) {
   //   l.radius = 2.0 + i*10;
   // } );
 
-  // console.log ( dots );
-
   // animation centerConnection
   lines.forEach( function( l, i ) {
     if (i <= numberOfPoints) {
-      l.material.uniforms.visibility.value = Math.cos(time/(6000-i));// % 1.0;
+      // l.material.uniforms.visibility.value = Math.cos(time/(6000-i));// % 1.0;
+      l.material.uniforms.visibility.value = Math.abs(Math.cos(speed) * 0.6);
+      console.log( l.material.uniforms.visibility.value = Math.abs(Math.cos(speed) * 0.6) );
     }
   } );
-  // console.log(time);
-
-
-  // lines[getRndInteger(1, lines.length)].material.uniforms.dashOffset.value = 0.002; //? (time/3000) % 1.0 : 1.0;
-
 
   renderer.render( scene, camera );
 
