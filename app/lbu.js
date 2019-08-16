@@ -354,16 +354,22 @@ function getGridCell(lat, lng) {
   return grid;
 }
 
-function getGridCellNeighborhood(lat, lng) {
-  return [].concat(
-    getGridCell(lat+1, lng-1), getGridCell(lat+1, lng+0), getGridCell(lat+1, lng+1),
-    getGridCell(lat+0, lng-1), getGridCell(lat+0, lng+0), getGridCell(lat+0, lng+1),
-    getGridCell(lat-1, lng-1), getGridCell(lat-1, lng+0), getGridCell(lat-1, lng+1),
-  );
+
+function getGridCellNeighborhood(lat, lng, dist = 1) {
+  dist = Math.floor(dist)
+  let data = [];
+  for ( let j=lat-dist; j<=lat+dist; j++ ) {
+    for ( let i=lng-dist; i<=lng+dist; i++ ) {
+      data = data.concat( getGridCell(j, i) );
+    }
+  }
+  return data;
 }
 
+
+const KM_PER_DEG = 111;
 function dist(p0, p1) {
-  return Math.sqrt( Math.pow((p0[0]-p1[0]) * 100, 2) + Math.pow((p0[1]-p1[1]) * 100, 2) );
+  return Math.sqrt( Math.pow((p0[0]-p1[0]) * KM_PER_DEG, 2) + Math.pow((p0[1]-p1[1]) * KM_PER_DEG, 2) );
 }
 
 export async function loadSampleData() {
@@ -397,7 +403,7 @@ export async function sampleLocation(previousPoint, distance = 100) {
   }
   
   // let data = getGridCell(previousPoint[0], previousPoint[1]);
-  const data = getGridCellNeighborhood(previousPoint[0], previousPoint[1]);
+  const data = getGridCellNeighborhood(previousPoint[0], previousPoint[1], distance / KM_PER_DEG);
   if (data.length == 0) return;
 
   // sort
@@ -468,10 +474,13 @@ export async function uploadCode(dotNum) {
 // Options:
 //   dotNum:   Dot for which to generate data. If left undefined (or NaN) a random dot is picked
 //   distance: Desired distance from last location of dot
+//   latitude/longitude: Provide specific location, overrides distance parameter if given
 export async function sampleUpload(opts) {
   const defaults = {
     dotNum: undefined,
-    distance: 100
+    distance: 100,
+    latitude: undefined,
+    longitude: undefined,
   };
   opts = Object.assign({}, defaults, opts);
   
@@ -487,16 +496,26 @@ export async function sampleUpload(opts) {
   const code = await uploadCode(opts.dotNum);
   const codeSymbols = code.split('_').reduce( (acc, num) => acc + String.fromCodePoint(digits[parseInt(num)][1]), '' );
   const photo = await samplePic();
+  
+  // Determine location
+  const loc = { latitude: 0, longitude: 0, accuracy: 0, timestamp: new Date() };
   const snap = await db.doc('_/streams').get();
   const streams = snap.data().last;
   const dotData = streams[ String(opts.dotNum).padStart(3,'0') ]; 
-
-  const loc = { latitude: 0, longitude: 0, accuracy: 0, timestamp: new Date() };
   const previousLoc = dotData ? dotData.slice(0,2) : null;
-  const newloc = await sampleLocation( previousLoc, opts.distance );
-  loc.latitude = newloc[0];
-  loc.longitude = newloc[1];
-  const distance = newloc[2]; // can be undefined, in case of random location
+  let distance;
+  if (opts.latitude !== undefined && opts.longitude !== undefined) { // use given location
+    loc.latitude = opts.latitude;
+    loc.longitude = opts.longitude;
+    if (previousLoc) {
+      distance = dist( previousLoc, [opts.latitude, opts.longitude] );
+    }
+  } else { // determine location based on distance
+    const newloc = await sampleLocation( previousLoc, opts.distance );
+    loc.latitude = newloc[0];
+    loc.longitude = newloc[1];
+    distance = newloc[2]; // can be undefined, in case of random location
+  }
 
   return {
     file: photo.file,
