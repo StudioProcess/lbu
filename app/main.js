@@ -60,6 +60,7 @@ async function setup() {
 
   initLibrary();
   initPageElements();
+  initUpload();
 
   let data = await lbu.onData(() => {});
   numberOfPoints = Object.keys(data.integrated).length; // set total number of visualized paths
@@ -592,5 +593,31 @@ function initPageElements() {
     // NOTE: this code is run when an image is selected the first time
     // TODO: move 'Choose Photo' input button out of the way
     console.log('image selected', e);
+  });
+}
+
+function initUpload() {
+  const log = console.log;
+  
+  document.querySelector('.finaluploadbutton').addEventListener('click', e => {
+    e.preventDefault();
+    
+    log('UPLOAD STARTED');
+    lbu.upload({
+      file: document.querySelector('#exampleFileUpload').files[0],
+      code: document.querySelector('#code').value,
+      message: document.querySelector('.messageupload textarea').value,
+      onProgress: status => {
+        log('PROGRESS', status);
+      },
+      onLocation: loc => {
+        log('LOCATION', loc);
+      },
+    }).then(_res => {
+      log('SUCCESS');
+    }).catch(err => {
+      log('ERROR', err);
+      throw err;
+    });
   });
 }
