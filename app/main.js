@@ -544,7 +544,7 @@ function loop(time) { // eslint-disable-line no-unused-vars
     if (i <= numberOfPoints) {
       // l.material.uniforms.visibility.value = Math.cos(time/(6000-i));// % 1.0;
       l.material.uniforms.visibility.value = Math.abs(Math.cos(speed) * 0.6);
-      console.log( l.material.uniforms.visibility.value = Math.abs(Math.cos(speed) * 0.6) );
+      // console.log( l.material.uniforms.visibility.value = Math.abs(Math.cos(speed) * 0.6) );
     }
   } );
 
@@ -587,4 +587,10 @@ function initPageElements() {
 
   // code entry
   lbu.setupCodeEntry({ code_input: '#code', digit_buttons: '#keypad button[data-digit]', delete_button: '#keypad button.delete' });
+  
+  lbu.setupImageSelect({ input: '#exampleFileUpload', background: '.image-upload' }).then(e => {
+    // NOTE: this code is run when an image is selected the first time
+    // TODO: move 'Choose Photo' input button out of the way
+    console.log('image selected', e);
+  });
 }
