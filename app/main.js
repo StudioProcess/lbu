@@ -187,7 +187,7 @@ function showLastPositionAsDots() {
           alphaTest: .5,//params.strokes ? .5 : 0,
           transparent: true,
           side: THREE.DoubleSide
-      });
+        });
 
         let mesh = new THREE.Mesh( dotGeo, mat );
         mesh.position.set(x, y, z);
@@ -542,7 +542,7 @@ function loop(time) { // eslint-disable-line no-unused-vars
 
   // animation centerConnection
   lines.forEach( function( l, i ) {
-    if (i <= numberOfPoints) {
+    if (i <= 27) { // TODO: current number of entries here instead of 27
       // l.material.uniforms.visibility.value = Math.cos(time/(6000-i));// % 1.0;
       l.material.uniforms.visibility.value = Math.abs(Math.cos(speed) * 0.6);
       // console.log( l.material.uniforms.visibility.value = Math.abs(Math.cos(speed) * 0.6) );
@@ -588,20 +588,24 @@ function initPageElements() {
 
   // code entry
   lbu.setupCodeEntry({ code_input: '#code', digit_buttons: '#keypad button[data-digit]', delete_button: '#keypad button.delete' });
-  
+
   lbu.setupImageSelect({ input: '#exampleFileUpload', background: '.image-upload' }).then(e => {
     // NOTE: this code is run when an image is selected the first time
-    // TODO: move 'Choose Photo' input button out of the way
+    // NOTE: 'Choose Photo' input button is hidden
+    // document.getElementById("uploadlabel").style.display = "none";
+    document.getElementById("uploadlabel").classList.remove("uploadbutton");
+    document.getElementById("uploadlabel").classList.add("uploadbuttonSelected");
+    document.getElementById("uploadlabel").innerHTML = 'Replace photo...';
     console.log('image selected', e);
   });
 }
 
 function initUpload() {
   const log = console.log;
-  
+
   document.querySelector('.finaluploadbutton').addEventListener('click', e => {
     e.preventDefault();
-    
+
     log('UPLOAD STARTED');
     lbu.upload({
       file: document.querySelector('#exampleFileUpload').files[0],
@@ -614,6 +618,8 @@ function initUpload() {
         log('LOCATION', loc);
       },
     }).then(_res => {
+      document.getElementById("keypad").style.display = "none";
+      document.getElementById("afterupload").style.display = "block";
       log('SUCCESS');
     }).catch(err => {
       log('ERROR', err);
