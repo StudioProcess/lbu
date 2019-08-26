@@ -1,5 +1,7 @@
 /*
   Exported functions:
+  
+  For use in production:
     init(config)
     setupCodeEntry(opts)
     setupPopCounter(opts)
@@ -7,12 +9,18 @@
     setupImageSelect(opts): Promise
     onData(cb): Promise
     upload(opts): Promise
-    
+  
+  Sample data:
     loadSampleData(): Promise
     sampleLocation(previousPoint, distance): Promise
     samplePic(width, height): Promise
     uploadCode(dotNum): Promise
     sampleUpload(opts): Promise
+    sampleStreamData(opts): Promise
+  
+  Reset functions:
+    resetStreams(): Promise
+    resetUploads(): Promise
 */
 
 const digits = {
@@ -348,7 +356,9 @@ export async function upload(opts) {
 
 
 
-// Sample Data
+/*
+ * Sample Data
+*/
 const _sampleDataPath = './data/sample_data.json';
 let _sampleDataPromise, _sampleData;
 
@@ -406,7 +416,7 @@ export async function sampleLocation(previousPoint, distance = 100) {
   await loadSampleData(); // make sure sample data is loaded
   if (!_sampleData) return; // return undefined if we have no data
   
-  if (!previousPoint) {     // get a random point
+  if (!previousPoint) {     // get a random point (ignore distance)
     let data;
     while (!data || data.length < 2000) { // find a full grid cell
       data = getGridCell( -90 + Math.random() * 180, -180 + Math.random() * 360 )
@@ -543,4 +553,178 @@ export async function sampleUpload(opts) {
     distance,
     dataURL: photo.dataURL
   };
+}
+
+
+// Add sample data to the stream, without going through the normal upload process
+// Note: This just adds data to the integrated stream, without simplifying
+// const SIMPLIFY_TOLERANCE = 0.5; // tolerance setting for simplify.js
+// const SIMPLIFY_THRESHOLD = 25;  // simplify only when more than this amount of points
+const KEEP_LAST = 10;           // how many points to keep in last array
+export async function sampleStreamData(opts) {
+  const defaults = {
+    dotNum: undefined, // if undefined, picks a random dot
+    startLatitude: undefined, // if undefined and dot has no previous location, picks a random location
+    startLongitude: undefined,
+    distanceMin: 50, // distance between steps
+    distanceMax: 250,
+    steps: 1, // how many points to add
+  };
+  opts = Object.assign({}, defaults, opts);
+  
+  if ( opts.dotNum === undefined || opts.dotNum === null || isNaN(opts.dotNum) ) {
+    opts.dotNum = Math.floor( 1 + Math.random() * 320 );
+  }
+  
+  let data = (await db.doc('_/streams').get()).data();
+  let dotkey = opts.dotNum.toString().padStart(3, '0');
+  
+  if ( opts.startLatitude === undefined || opts.startLatitude === null || isNaN(opts.startLatitude) ||
+    opts.startLongitude === undefined || opts.startLongitude === null || isNaN(opts.startLongitude)) {
+    // check for previous location
+    if (data.last && data.last[dotkey] && data.last[dotkey].length >= 3) { // get last location of dot stream
+      let last = data.last[dotkey].slice(-3);
+      let dist = Math.floor( opts.distanceMin + Math.random() * (opts.distanceMax - opts.distanceMin) );
+      let loc = await sampleLocation( last, dist );
+      opts.startLatitude = loc[0];
+      opts.startLongitude = loc[1];
+      // console.log('previous location: ', last[0], last[1], loc[0], loc[1]);
+    } else {
+      // get a random start location
+      let loc = await sampleLocation(); 
+      opts.startLatitude  = loc[0];
+      opts.startLongitude = loc[1];
+      // console.log('random location: ', loc[0], loc[1]);
+    }
+  }
+  
+  if (opts.distanceMin == undefined) { // only true for undefined and null
+    opts.distanceMin = defaults.distanceMin;
+  }
+  
+  if (opts.distanceMax == undefined) { // only true for undefined and null
+    opts.distanceMax = defaults.distanceMax;
+  }
+  
+  if (opts.steps == undefined) {
+    opts.steps = defaults.steps;
+  }
+  
+  if (opts.distanceMin > opts.distanceMax) {
+    let help = opts.distanceMin;
+    opts.distanceMin = opts.distanceMax;
+    opts.distanceMax = help;
+  }
+  
+  let locs = [opts.startLatitude, opts.startLongitude];
+  if (opts.steps <= 0) opts.steps = 1; 
+  for (let i=0; i<opts.steps-1; i++) {
+    let dist = Math.floor( opts.distanceMin + Math.random() * (opts.distanceMax - opts.distanceMin) );
+    let prevLoc = locs.slice(i*2, i*2+2);
+    let loc = await sampleLocation( prevLoc, dist );
+    loc = loc.slice(0, 2);
+    locs.push(...loc);
+  }
+  
+  // integrated property
+  let integrated = data.integrated[dotkey] || [];
+  integrated.push(...locs);
+  data.integrated[dotkey] = integrated;
+  
+  // last property
+  let last = data.last[dotkey] || [];
+  let locs_ts = locs.reduce((acc, val, idx) => {
+    acc.push(val);
+    if (idx > 0 && idx % 2 == 1) acc.push(0); // just add a zero timestamp
+    return acc;
+  }, []);
+  last.push(...locs_ts);
+  last = last.slice(0, KEEP_LAST*3);
+  data.last[dotkey] = last;
+  
+  // last updated property
+  data.updated = dotkey;
+  // console.log(data);
+  return db.doc('_/streams').set(data);
+}
+
+
+/*
+ * Reset functions
+ * Note: Needs rules enabled in firestore.rules and storage.rules
+*/
+
+// Reset streams document to empty state
+export async function resetStreams() {
+  return db.doc('_/streams').set({
+    integrated: {}, last: {}, updated: ''
+  }).then(() => {
+    console.log('COMPLETED resetStreams');
+  });
+}
+
+// Reset uploads (i.e. uploads collection in firestore and images in storage)
+export async function resetUploads() {
+  // delete uploads collection
+  await deleteCollection(db, 'uploads', 100).then(() => {
+    console.log('  Note: Deleted uploads collection');
+  });
+  
+  // delete storage
+  // needs list and delete permissions (write)
+  let result = await storage.ref('/').listAll();
+  let folderRefs = result.prefixes;
+  
+  let filePromises = folderRefs.map(ref => ref.listAll());
+  
+  result = await Promise.all(filePromises);
+  let fileRefs = result.reduce((acc, res) => acc.concat(res.items), []);
+  
+  let deletePromises = fileRefs.map(ref => ref.delete());
+  return Promise.all(deletePromises).then(() => {
+    console.log('  Note: Deleted images in storage bucket');
+    console.log('COMPLETED resetUploads');
+  });
+}
+
+// Helper for resetUploads()
+async function deleteCollection(db, collectionPath, batchSize) {
+  let collectionRef = db.collection(collectionPath);
+  let query = collectionRef.orderBy('__name__').limit(batchSize);
+
+  return new Promise((resolve, reject) => {
+    deleteQueryBatch(db, query, batchSize, resolve, reject);
+  });
+}
+
+// Helper for deleteCollection()
+function deleteQueryBatch(db, query, batchSize, resolve, reject) {
+  query.get()
+    .then((snapshot) => {
+      // When there are no documents left, we are done
+      if (snapshot.size == 0) {
+        return 0;
+      }
+
+      // Delete documents in a batch
+      let batch = db.batch();
+      snapshot.docs.forEach((doc) => {
+        batch.delete(doc.ref);
+      });
+
+      return batch.commit().then(() => {
+        return snapshot.size;
+      });
+    }).then((numDeleted) => {
+      if (numDeleted === 0) {
+        resolve();
+        return;
+      }
+
+      // Recurse on the next process tick, to avoid
+      // exploding the stack.
+      window.setTimeout(() => {
+        deleteQueryBatch(db, query, batchSize, resolve, reject);
+      }, 0);
+    }).catch(reject);
 }
