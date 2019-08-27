@@ -10,7 +10,9 @@
   "scripts": {
     "start": "browser-sync . --port 8080 --no-notify --files index.html app",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "reinstall": "npm ci"
+    "reinstall": "npm ci",
+    "bundle": "node rollup.js",
+    "start-bundle": "browser-sync public --port 8080 --no-notify"
   },
   "keywords": [],
   "author": "Process <contact@process.studio> (https://process.studio)",
@@ -19,6 +21,13 @@
     "three": "^0.107.0"
   },
   "devDependencies": {
-    "browser-sync": "^2.26.7"
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "browser-sync": "^2.26.7",
+    "fs-extra": "^8.1.0",
+    "rollup": "^1.20.2",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-buble": "^0.19.8",
+    "rollup-plugin-terser": "^5.1.1"
   }
 }
