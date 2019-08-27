@@ -607,6 +607,20 @@ function initUpload() {
     e.preventDefault();
 
     log('UPLOAD STARTED');
+    document.getElementById("MissingFile").style.display = "none";
+    document.getElementById("InvalidFileParameter").style.display = "none";
+    document.getElementById("InvalidFileType").style.display = "none";
+    document.getElementById("InvalidFileSize").style.display = "none";
+    document.getElementById("InvalidCodeFormat").style.display = "none";
+    document.getElementById("GeolocationUnsupported").style.display = "none";
+    document.getElementById("GeolocationDenied").style.display = "none";
+    document.getElementById("GeolocationUnavailable").style.display = "none";
+    document.getElementById("GeolocationTimeout").style.display = "none";
+    document.getElementById("InvalidCode").style.display = "none";
+    document.getElementById("UploadSize").style.display = "none";
+    document.getElementById("UploadError").style.display = "none";
+
+
     lbu.upload({
       file: document.querySelector('#exampleFileUpload').files[0],
       code: document.querySelector('#code').value,
@@ -622,8 +636,32 @@ function initUpload() {
       document.getElementById("afterupload").style.display = "block";
       log('SUCCESS');
     }).catch(err => {
-      log('ERROR', err);
-      throw err;
+      // log('ERROR', err);
+      //   { name:'MissingFile',            message:'No file provided' }
+      //   { name:'InvalidFileParameter',   message:'Invalid file parameter' }
+      //   { name:'InvalidFileType',        message:'Invalid file type. Please select PNG, JPEG or WEBP' }
+      //   { name:'InvalidFileSize',        message:'File size exeeds upload limit' }
+      //   { name:'InvalidCodeFormat',      message:'Invalid code format' }
+      //   { name:'GeolocationUnsupported', message:'Geolocation feature unsupported in browser' }
+      //   { name:'GeolocationDenied',      message:'Geolocation denied by user or browser settings' }
+      //   { name:'GeolocationUnavailable', message:'Geolocation (temporarily) unavailable' }
+      //   { name:'GeolocationTimeout',     message:'Geolocation timeout' }
+      //   { name:'InvalidCode',            message:'Invalid upload code provided' }
+      //   { name:'UploadSize',             message:'Upload size limit exeeded' }
+      //   { name:'UploadError',            message:'Error while uploading file', errorObject }
+      if(err.name == 'MissingFile') { document.getElementById("MissingFile").style.display = "block"; }
+      if(err.name == 'InvalidFileParameter') { document.getElementById("InvalidFileParameter").style.display = "block"; }
+      if(err.name == 'InvalidFileType') { document.getElementById("InvalidFileType").style.display = "block"; }
+      if(err.name == 'InvalidFileSize') { document.getElementById("InvalidFileSize").style.display = "block"; }
+      if(err.name == 'InvalidCodeFormat') { document.getElementById("InvalidCodeFormat").style.display = "block"; }
+      if(err.name == 'GeolocationUnsupported') { document.getElementById("GeolocationUnsupported").style.display = "block"; }
+      if(err.name == 'GeolocationDenied') { document.getElementById("GeolocationDenied").style.display = "block"; }
+      if(err.name == 'GeolocationUnavailable') { document.getElementById("GeolocationUnavailable").style.display = "block"; }
+      if(err.name == 'GeolocationTimeout') { document.getElementById("GeolocationTimeout").style.display = "block"; }
+      if(err.name == 'InvalidCode') { document.getElementById("InvalidCode").style.display = "block"; }
+      if(err.name == 'UploadSize') { document.getElementById("UploadSize").style.display = "block"; }
+      if(err.name == 'UploadError') { document.getElementById("UploadError").style.display = "block"; }
+      throw err.message;
     });
   });
 }

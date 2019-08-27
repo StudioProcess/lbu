@@ -133,6 +133,13 @@ canvas {
   display: none;
 }
 
+#MissingFile, #InvalidFileParameter, #InvalidFileType, #InvalidFileSize, #InvalidCodeFormat, #GeolocationUnsupported, #GeolocationDenied, #GeolocationUnavailable, #GeolocationTimeout, #InvalidCode, #UploadSize, #UploadError {
+  display: none;
+  font-size: 20px;
+  color: #ff6666;
+  text-align: center;
+}
+
 .finaluploadbutton {
   margin-top: 1em !important;
   background-color: #fff !important;
