@@ -18,6 +18,7 @@
   "author": "Process <contact@process.studio> (https://process.studio)",
   "license": "AGPL-3.0",
   "dependencies": {
+    "foundation-sites": "^6.5.3",
     "three": "^0.107.0"
   },
   "devDependencies": {
