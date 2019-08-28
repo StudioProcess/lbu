@@ -160,6 +160,29 @@ export async function setupImageSelect(opts, cb) {
 
 
 // Streams data
+// Takes an optional callback that is called each time there is an update
+// Returns a promise that resolves with the first data snapshot
+// Data structure:
+// {
+//   integrated: {
+//     "000": [lat_0, lng_0, lat_1, lng_1, ...],
+//     "001": ...
+//      ...
+//     "321": ...
+//   },
+//   last: {
+//     "000": [lat_n, lng_n, ts_n, lat_n-1, lng_n-1, ts_n-1, ...],
+//     "001": ... 
+//      ...
+//     "321":
+//   }
+//   updated: "001"
+// }
+// NOTES: 
+//   "integrated": a simplified path for each dot stream (uses simplify.js). last entry are newest
+//   "last": the last n entries with timestamps. first entry is newest
+//   "updated": key of last updated stream
+
 export function onData(cb) {
   return new Promise( (resolve, _reject) => {
     db.doc('_/streams').onSnapshot(snap => {
@@ -244,6 +267,7 @@ function getFileMetadata(file) {
 //   { name:'InvalidFileParameter',   message:'Invalid file parameter' }
 //   { name:'InvalidFileType',        message:'Invalid file type. Please select PNG, JPEG or WEBP' }
 //   { name:'InvalidFileSize',        message:'File size exeeds upload limit' }
+//   { name:'MissingCode',            message:'No upload code provided' }
 //   { name:'InvalidCodeFormat',      message:'Invalid code format' }
 //   { name:'GeolocationUnsupported', message:'Geolocation feature unsupported in browser' }
 //   { name:'GeolocationDenied',      message:'Geolocation denied by user or browser settings' }
@@ -563,14 +587,15 @@ export async function sampleUpload(opts) {
 }
 
 
-// Add sample data to the stream, without going through the normal upload process
-// Note: This just adds data to the integrated stream, without simplifying
+
+// Adds sample data to the specified dot stream
+// Returns a new data object
 // const SIMPLIFY_TOLERANCE = 0.5; // tolerance setting for simplify.js
 // const SIMPLIFY_THRESHOLD = 25;  // simplify only when more than this amount of points
 const KEEP_LAST = 10;           // how many points to keep in last array
-export async function sampleStreamData(opts) {
+async function addSampleStream(data, opts) {
   const defaults = {
-    dotNum: undefined, // if undefined, picks a random dot
+    dotNum: 0,
     startLatitude: undefined, // if undefined and dot has no previous location, picks a random location
     startLongitude: undefined,
     distanceMin: 50, // distance between steps
@@ -579,50 +604,44 @@ export async function sampleStreamData(opts) {
   };
   opts = Object.assign({}, defaults, opts);
   
-  if ( opts.dotNum === undefined || opts.dotNum === null || isNaN(opts.dotNum) ) {
-    opts.dotNum = Math.floor( 1 + Math.random() * 320 );
-  }
+  data = Object.assign({}, data); // clone data object
   
-  let data = (await db.doc('_/streams').get()).data();
-  let dotkey = opts.dotNum.toString().padStart(3, '0');
-  
-  if ( opts.startLatitude === undefined || opts.startLatitude === null || isNaN(opts.startLatitude) ||
-    opts.startLongitude === undefined || opts.startLongitude === null || isNaN(opts.startLongitude)) {
-    // check for previous location
-    if (data.last && data.last[dotkey] && data.last[dotkey].length >= 3) { // get last location of dot stream
-      let last = data.last[dotkey].slice(-3);
-      let dist = Math.floor( opts.distanceMin + Math.random() * (opts.distanceMax - opts.distanceMin) );
-      let loc = await sampleLocation( last, dist );
-      opts.startLatitude = loc[0];
-      opts.startLongitude = loc[1];
-      // console.log('previous location: ', last[0], last[1], loc[0], loc[1]);
-    } else {
-      // get a random start location
-      let loc = await sampleLocation(); 
-      opts.startLatitude  = loc[0];
-      opts.startLongitude = loc[1];
-      // console.log('random location: ', loc[0], loc[1]);
-    }
-  }
-  
-  if (opts.distanceMin == undefined) { // only true for undefined and null
-    opts.distanceMin = defaults.distanceMin;
-  }
-  
-  if (opts.distanceMax == undefined) { // only true for undefined and null
-    opts.distanceMax = defaults.distanceMax;
-  }
-  
-  if (opts.steps == undefined) {
-    opts.steps = defaults.steps;
-  }
-  
+  // parameter checks and sanitizing 
+  if (opts.steps <= 0) return data;
+  if (opts.steps == undefined) { opts.steps = defaults.steps; }
+  if (opts.distanceMin == undefined || opts.distanceMin <= 0) { opts.distanceMin = defaults.distanceMin; }
+  if (opts.distanceMax == undefined || opts.distanceMax <= 0) { opts.distanceMax = defaults.distanceMax; }
   if (opts.distanceMin > opts.distanceMax) {
     let help = opts.distanceMin;
     opts.distanceMin = opts.distanceMax;
     opts.distanceMax = help;
   }
   
+  let dotkey = opts.dotNum.toString().padStart(3, '0');
+  console.log('ADDING TO STREAM', dotkey, '(' + opts.steps + ' steps)')
+  // determine start location (given, from previous, random)
+  if ( opts.startLatitude === undefined || opts.startLatitude === null || isNaN(opts.startLatitude) ||
+    opts.startLongitude === undefined || opts.startLongitude === null || isNaN(opts.startLongitude)) {
+    // check for previous location
+    if (data.last && data.last[dotkey] && data.last[dotkey].length >= 3) { // get last location of dot stream
+      let last = data.last[dotkey].slice(0, 3);
+      let dist = Math.floor( opts.distanceMin + Math.random() * (opts.distanceMax - opts.distanceMin) );
+      let loc = await sampleLocation( last, dist );
+      opts.startLatitude = loc[0];
+      opts.startLongitude = loc[1];
+      console.log('  previous location:', last[0], last[1], "start at:", loc[0], loc[1]);
+    } else {
+      // get a random start location
+      let loc = await sampleLocation(); 
+      opts.startLatitude  = loc[0];
+      opts.startLongitude = loc[1];
+      console.log('  start at random location:', loc[0], loc[1]);
+    }
+  } else {
+    console.log('  start at forced location:', opts.startLatitude, opts.startLongitude);
+  }
+  
+  // generate stream of locations
   let locs = [opts.startLatitude, opts.startLongitude];
   if (opts.steps <= 0) opts.steps = 1; 
   for (let i=0; i<opts.steps-1; i++) {
@@ -640,20 +659,82 @@ export async function sampleStreamData(opts) {
   
   // last property
   let last = data.last[dotkey] || [];
-  let locs_ts = locs.reduce((acc, val, idx) => {
-    acc.push(val);
-    if (idx > 0 && idx % 2 == 1) acc.push(0); // just add a zero timestamp
-    return acc;
-  }, []);
-  last.push(...locs_ts);
+  for (let i=0; i<locs.length; i+=2) {
+    last.unshift(locs[i], locs[i+1], 0);
+  }
   last = last.slice(0, KEEP_LAST*3);
   data.last[dotkey] = last;
   
   // last updated property
   data.updated = dotkey;
+  
+  return data;
+}
+
+// Add sample data to the stream, without going through the normal upload process
+// Note: This just adds data to the integrated stream, without simplifying
+export async function sampleStreamData(opts) {
+  const defaults = {
+    dotNum: undefined, // if undefined, picks a random dot
+    startLatitude: undefined, // if undefined and dot has no previous location, picks a random location
+    startLongitude: undefined,
+    distanceMin: 50, // distance between steps
+    distanceMax: 250,
+    steps: 1, // how many points to add
+  };
+  opts = Object.assign({}, defaults, opts);
+  if ( opts.dotNum === undefined || opts.dotNum === null || isNaN(opts.dotNum) ) {
+    opts.dotNum = Math.floor( 1 + Math.random() * 320 );
+  }
+  
+  let data = (await db.doc('_/streams').get()).data();
+  data = await addSampleStream(data, opts);
   // console.log(data);
   return db.doc('_/streams').set(data);
 }
+
+// Add sample Data to multiple streams simultaneously
+export async function sampleStreamDataMultiple(opts) {
+  const defaults = {
+    startDot: 1,
+    endDot: 10,
+    distanceMin: 50, // distance between steps
+    distanceMax: 250,
+    steps: 1, // how many points to add to each dot stream
+    stepChance: 1,
+  };
+  opts = Object.assign({}, defaults, opts);
+  
+  if (opts.startDot > opts.endDot) {
+    let help = opts.startDot;
+    opts.startDot = opts.endDot;
+    opts.endDot = help;
+  }
+  
+  if (opts.startDot < 0 || opts.startDot > 321 || opts.endDot < 0 || opts.endDot > 321) {
+    console.warn('sampleScatterData: Invalid startDot / endDot parameters');
+    return;
+  }
+  
+  let data = (await db.doc('_/streams').get()).data();
+  
+  for (let dotNum = opts.startDot; dotNum <= opts.endDot; dotNum++) {
+    // how many steps to add to this dot stream 
+    let steps = 0;
+    for (let i=0; i<opts.steps; i++) { if (Math.random() < opts.stepChance) steps++; }
+    // add to dot stream
+    data = await addSampleStream(data, {
+      dotNum,
+      distanceMin: opts.distanceMin,
+      distanceMax: opts.distanceMax,
+      steps,
+    });
+  }
+  
+  // update data
+  return db.doc('_/streams').set(data);
+}
+
 
 
 /*
