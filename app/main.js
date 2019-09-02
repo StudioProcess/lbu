@@ -15,13 +15,17 @@ const H = 800;
 let renderer, scene, camera;
 let controls; // eslint-disable-line no-unused-vars
 
-let objectSize = 1.0;
+let objectSize = 0.7;
 let centerConnectionWidth = 2.11;
-let pathConnectionWidth = 2.5;
+let pathConnectionWidth = 5.5;
 
 var resolution = new THREE.Vector2( window.innerWidth, window.innerHeight );
 
 let projectColors = [ '#ce3b43', '#2452c2', '#f2c200', '#b94db3', '#9bcfe4', '#b7b5a8', '#CCCCCC', '#CCDEFF' ];
+
+let pathMesh;
+let pathMeshes = [];
+var nEnd = 0, nMax, nStep = 90; // 30 faces * 3 vertices/face
 
 var Params = function() {
   this.curves = true;
@@ -77,23 +81,133 @@ function getRndInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1) ) + min;
 }
 
+
+let noOfPoint = 0;
+let coordinatesXYZ = [];
 // get data, copy object for further usage
 lbu.onData( ( data ) => {
-  // console.log(data.integrated);
+  // add points of each stream as array to coordinates
+  // in data.last sind nur letzten (genauer) -> eventl. nicht verwenden
   for (let key of Object.keys(data.integrated)) {
-    let points = data.integrated[key];
+    let points = data.integrated[key]; // array of points for individual stream
+    // console.log( points );
 
-    // mapping of lat lon
-    // make transformation to xyz
+    // TODO: mapping of lat lon
 
-    // last positions sphere
-    // paths
-    // connection to center
+    // transformation: lat/lon -> x/y/z
+    let coordinatesOnStream = [];
+    for(let t = 0; t < points.length-1; t++) {
 
-    // console.log("first point: "+points[0]+"/"+points[1]+" plus "+( points.length-2)/2+" more points");
+      var lat = points[t];
+      var lon = points[t+1];
+
+      var cosLat = Math.cos(lat * Math.PI / 180.0);
+      var sinLat = Math.sin(lat * Math.PI / 180.0);
+      var cosLon = Math.cos(lon * Math.PI / 180.0);
+      var sinLon = Math.sin(lon * Math.PI / 180.0);
+      var rad = 40.0;
+      let x = rad * cosLat * cosLon;
+      let y = rad * cosLat * sinLon;
+      let z = rad * sinLat;
+
+      coordinatesOnStream.push( {x: x, y: y, z: z} );
+    }
+    coordinatesXYZ.splice(noOfPoint, 0, coordinatesOnStream);
+    noOfPoint++;
+
   }
- } );
 
+
+  // LAST POINT AS SPHERES
+  // last positions sphere: last position is added at end of array
+  for (let key of Object.keys(coordinatesXYZ)) {
+    // get last coordinate
+    let index = coordinatesXYZ[key].length;
+    // coordinatesXYZ[key][index-1].x
+    // place sphere
+    let x = coordinatesXYZ[key][index-1].x;
+    let y = coordinatesXYZ[key][index-1].y;
+    let z = coordinatesXYZ[key][index-1].z;
+
+    // console.log( "x: "+x+" - y: "+y+" - z: "+z );
+
+    let dotGeo = null;
+    let mat = null;
+
+    dotGeo = new THREE.SphereGeometry( objectSize/2, 5, 5 );
+
+    mat = new THREE.MeshBasicMaterial( {
+      useMap: params.strokes,
+      color: new THREE.Color( 0xFF0000 ),
+      opacity: params.strokes ? .5 : 1,
+      dashArray: params.dashArray,
+      dashOffset: params.dashOffset,
+      dashRatio: params.dashRatio,
+      resolution: resolution,
+      sizeAttenuation: params.sizeAttenuation,
+      lineWidth: centerConnectionWidth,
+      near: camera.near,
+      far: camera.far,
+      depthWrite: false,
+      depthTest: !params.strokes,
+      alphaTest: .5,//params.strokes ? .5 : 0,
+      transparent: true,
+      side: THREE.DoubleSide
+    });
+
+    let mesh = new THREE.Mesh( dotGeo, mat );
+    mesh.position.set(x, y, z);
+    scene.add( mesh );
+  }
+
+  // VISUALIZE TRAVELLED PATHS
+  for (let key of Object.keys(coordinatesXYZ)) {
+
+    // get points on current stream
+    let streamPoints = coordinatesXYZ[key];
+    let pathPoints = [];
+
+    if(streamPoints.length > 1) {
+      for (let i = 0; i < streamPoints.length; i++) {
+        let x = streamPoints[i].x;
+        let y = streamPoints[i].y;
+        let z = streamPoints[i].z;
+
+        pathPoints.push ( new THREE.Vector3(x,y,z) );
+        i++;
+      }
+
+      // path
+      var path = new THREE.CatmullRomCurve3( pathPoints );
+
+      // params
+      var pathSegments = 20;
+      var tubeRadius = 0.2;
+      var radiusSegments = 3;
+      var closed = false;
+
+      // geometry
+      let tubeGeometry = new THREE.TubeGeometry( path, pathSegments, tubeRadius, radiusSegments, closed );
+
+      // to buffer goemetry
+      tubeGeometry = new THREE.BufferGeometry().fromGeometry( tubeGeometry );
+      nMax = tubeGeometry.attributes.position.count;
+
+      var splineMat = new THREE.MeshBasicMaterial( {
+        color: 0x0000ff,
+        side: THREE.DoubleSide,
+        transparent: true,
+        wireframe: true
+      } );
+
+      pathMesh = new THREE.Mesh( tubeGeometry, splineMat );
+      pathMeshes.push( pathMesh );
+      scene.add( pathMesh );
+    }
+  }
+
+  // TODO: center connections
+});
 
 function loop(time) { // eslint-disable-line no-unused-vars
 
@@ -105,6 +219,10 @@ function loop(time) { // eslint-disable-line no-unused-vars
 
   requestAnimationFrame( loop );
 
+  nEnd = ( nEnd + nStep ) % nMax;
+  // for(let u=0; u < pathMeshes.length; u++){
+  //   pathMeshes[u].geometry.setDrawRange( 0, nEnd );
+  // }
   renderer.render( scene, camera );
 }
 
