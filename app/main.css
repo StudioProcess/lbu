@@ -1,5 +1,6 @@
 body {
-  background-color: #ccf0fd;
+  background-color: #FFFFFF;
+  /* background-color: #ccf0fd; */
   /* background-color: #cce0e7; */
   /* background-color: #0e6eca; */
 }
@@ -122,7 +123,10 @@ canvas {
   font-weight: bold;
   text-align: center;
   /* text-transform: uppercase; */
+  /* color: #2452c2; */
   line-height: 1.2;
+  text-decoration: underline wavy #c0e0ff;
+  text-underline-offset: 5px;
 }
 
 .textresize {
@@ -132,6 +136,7 @@ canvas {
 }
 
 .credits {
+  background-color: #ccf0fd;
   padding-top: 2em;
   padding-bottom: 2em;
   text-align: center;
@@ -274,6 +279,7 @@ textarea::placeholder {
 } */
 
 #contribute {
+  background-color: #ccf0fd;
   background-image: url('../assets/contribute_bg.png') !important;
   background-position: top;
   background-repeat: no-repeat;
@@ -334,7 +340,7 @@ textarea::placeholder {
     text-align: right;
     line-height: 1.0;
     font-size: 20px;
-    background-color: #ccf0fd;
+    /* background-color: #ccf0fd; */
     opacity: 0.8;
     padding: 1em !important;
   }
@@ -384,7 +390,7 @@ textarea::placeholder {
     text-align: right;
     line-height: 1.0;
     font-size: 15px;
-    background-color: #ccf0fd;
+    /* background-color: #ccf0fd; */
     padding: 1em !important;
     opacity: 0.8;
   }

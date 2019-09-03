@@ -15,9 +15,9 @@ const H = 800;
 let renderer, scene, camera;
 let controls; // eslint-disable-line no-unused-vars
 
-let objectSize = 0.7;
+let objectSize = 0.8;
 let centerConnectionWidth = 2.11;
-let pathConnectionWidth = 5.5;
+let pathConnectionWidth = 9.5;
 
 var resolution = new THREE.Vector2( window.innerWidth, window.innerHeight );
 
@@ -84,38 +84,136 @@ function getRndInteger(min, max) {
 
 let noOfPoint = 0;
 let coordinatesXYZ = [];
+let minLat = 90;
+let maxLat = -90;
+let minLon = 90;
+let maxLon = -90;
+let mappedLat = [];
+let mappedLon = [];
+let mappedLatLon = [];
 // get data, copy object for further usage
 lbu.onData( ( data ) => {
   // add points of each stream as array to coordinates
   // in data.last sind nur letzten (genauer) -> eventl. nicht verwenden
+
+  // mapping of lat lon
   for (let key of Object.keys(data.integrated)) {
+    let points = data.integrated[key];
+
+    for(let u = 0; u < points.length-1; u++) { // for all previous points for each streams
+      let lat = data.integrated[key][u];
+      let lon = data.integrated[key][u+1];
+
+      if (lat <= minLat) { minLat = lat; }
+      if (lat >= maxLat) { maxLat = lat; }
+
+      if (lon <= minLon) { minLon = lon; }
+      if (lon >= maxLon) { maxLon = lon; }
+
+      // originalLat.push(lat);
+      // originalLon.push(lon);
+      //
+      // numberOfCoords++;
+      u++;
+    }
+    // console.log("minLat: "+ minLat);
+    // console.log("maxLat: "+ maxLat);
+    // console.log("minLon: "+ minLon);
+    // console.log("maxLon: "+ maxLon);
+    // noPointsPerStream[key] = points.length/2;
+  }
+
+  let indexOfStream = 0;
+  for (let key of Object.keys(data.integrated)) {
+    let points = data.integrated[key];
+    // let tempMappedLat = [];
+    // let tempMappedLon = [];
+    let tempMappedLatLon = [];
+
+    for(let t = 1; t < points.length-1; t++) {
+      // console.log ( minLat );
+      let lat = data.integrated[key][t].map(minLat, maxLat, -90, 90);
+      let lon = data.integrated[key][t+1].map(minLon, maxLon, -180, 180);
+
+      // tempMappedLatLon.push();
+      tempMappedLatLon.push( data.integrated[key][t].map(minLat, maxLat, -90, 90) );
+      tempMappedLatLon.push( data.integrated[key][t+1].map(minLon, maxLon, -180, 180) );
+    }
+
+    mappedLatLon.splice(indexOfStream, 0, tempMappedLatLon);
+    // mappedLon.splice(indexOfStream, 0, tempMappedLon);
+    indexOfStream++;
+  }
+
+  // console.log( mappedLatLon );
+
+
+
+  // BEGIN using mapped data
+  // for (let i = 0; i < mappedLatLon.length-1; i++ ) {
+  //   // let points = data.integrated[key]; // array of points for individual stream
+  //   let points = mappedLatLon[i];
+  //   // console.log( points );
+  //
+  //
+  //   if(points.length > 0) {
+  //     // transformation: lat/lon -> x/y/z
+  //     let coordinatesOnStream = [];
+  //     for(let t = 0; t < points.length-1; t++) {
+  //
+  //       var lat = points[t];
+  //       var lon = points[t+1];
+  //
+  //       var cosLat = Math.cos(lat * Math.PI / 180.0);
+  //       var sinLat = Math.sin(lat * Math.PI / 180.0);
+  //       var cosLon = Math.cos(lon * Math.PI / 180.0);
+  //       var sinLon = Math.sin(lon * Math.PI / 180.0);
+  //       var rad = 40.0;
+  //       let x = rad * cosLat * cosLon;
+  //       let y = rad * cosLat * sinLon;
+  //       let z = rad * sinLat;
+  //
+  //       coordinatesOnStream.push( {x: x, y: y, z: z} );
+  //     }
+  //     coordinatesXYZ.splice(noOfPoint, 0, coordinatesOnStream);
+  //     noOfPoint++;
+  //   }
+  // }
+  // END MAPPED DATA
+
+  // BEGIN using original data
+  for (let key of Object.keys(data.integrated) ) {
     let points = data.integrated[key]; // array of points for individual stream
+    // let points = mappedLatLon[i];
     // console.log( points );
 
-    // TODO: mapping of lat lon
 
-    // transformation: lat/lon -> x/y/z
-    let coordinatesOnStream = [];
-    for(let t = 0; t < points.length-1; t++) {
+    if(points.length > 0) {
+      // transformation: lat/lon -> x/y/z
+      let coordinatesOnStream = [];
+      for(let t = 0; t < points.length-1; t++) {
 
-      var lat = points[t];
-      var lon = points[t+1];
+        var lat = points[t];
+        var lon = points[t+1];
 
-      var cosLat = Math.cos(lat * Math.PI / 180.0);
-      var sinLat = Math.sin(lat * Math.PI / 180.0);
-      var cosLon = Math.cos(lon * Math.PI / 180.0);
-      var sinLon = Math.sin(lon * Math.PI / 180.0);
-      var rad = 40.0;
-      let x = rad * cosLat * cosLon;
-      let y = rad * cosLat * sinLon;
-      let z = rad * sinLat;
+        var cosLat = Math.cos(lat * Math.PI / 180.0);
+        var sinLat = Math.sin(lat * Math.PI / 180.0);
+        var cosLon = Math.cos(lon * Math.PI / 180.0);
+        var sinLon = Math.sin(lon * Math.PI / 180.0);
+        var rad = 40.0;
+        let x = rad * cosLat * cosLon;
+        let y = rad * cosLat * sinLon;
+        let z = rad * sinLat;
 
-      coordinatesOnStream.push( {x: x, y: y, z: z} );
+        coordinatesOnStream.push( {x: x, y: y, z: z} );
+      }
+      coordinatesXYZ.splice(noOfPoint, 0, coordinatesOnStream);
+      noOfPoint++;
     }
-    coordinatesXYZ.splice(noOfPoint, 0, coordinatesOnStream);
-    noOfPoint++;
-
   }
+  // END ORIGINAL DATA
+
+  // console.log( coordinatesXYZ );
 
 
   // LAST POINT AS SPHERES
@@ -125,39 +223,45 @@ lbu.onData( ( data ) => {
     let index = coordinatesXYZ[key].length;
     // coordinatesXYZ[key][index-1].x
     // place sphere
-    let x = coordinatesXYZ[key][index-1].x;
-    let y = coordinatesXYZ[key][index-1].y;
-    let z = coordinatesXYZ[key][index-1].z;
+    console.log( coordinatesXYZ[key].length );
+    if((coordinatesXYZ[key].length) > 0){
+      let x = coordinatesXYZ[key][index-1].x;
+      let y = coordinatesXYZ[key][index-1].y;
+      let z = coordinatesXYZ[key][index-1].z;
 
-    // console.log( "x: "+x+" - y: "+y+" - z: "+z );
+      // console.log( "x: "+x+" - y: "+y+" - z: "+z );
 
-    let dotGeo = null;
-    let mat = null;
+      let dotGeo = null;
+      let mat = null;
 
-    dotGeo = new THREE.SphereGeometry( objectSize/2, 5, 5 );
+      dotGeo = new THREE.SphereGeometry( objectSize/2, 5, 5 );
 
-    mat = new THREE.MeshBasicMaterial( {
-      useMap: params.strokes,
-      color: new THREE.Color( 0xFF0000 ),
-      opacity: params.strokes ? .5 : 1,
-      dashArray: params.dashArray,
-      dashOffset: params.dashOffset,
-      dashRatio: params.dashRatio,
-      resolution: resolution,
-      sizeAttenuation: params.sizeAttenuation,
-      lineWidth: centerConnectionWidth,
-      near: camera.near,
-      far: camera.far,
-      depthWrite: false,
-      depthTest: !params.strokes,
-      alphaTest: .5,//params.strokes ? .5 : 0,
-      transparent: true,
-      side: THREE.DoubleSide
-    });
+      mat = new MeshLineMaterial( {
+        useMap: params.strokes,
+        color: new THREE.Color( 0xff6666 ),
+        opacity: params.strokes ? .5 : 1,
+        dashArray: params.dashArray,
+        dashOffset: params.dashOffset,
+        dashRatio: params.dashRatio,
+        resolution: resolution,
+        sizeAttenuation: params.sizeAttenuation,
+        lineWidth: centerConnectionWidth,
+        near: camera.near,
+        far: camera.far,
+        depthWrite: false,
+        depthTest: !params.strokes,
+        alphaTest: .5,//params.strokes ? .5 : 0,
+        transparent: true,
+        side: THREE.DoubleSide
+      });
 
-    let mesh = new THREE.Mesh( dotGeo, mat );
-    mesh.position.set(x, y, z);
-    scene.add( mesh );
+      let mesh = new THREE.Mesh( dotGeo, mat );
+      mesh.position.set(x, y, z);
+      scene.add( mesh );
+
+    }
+    //
+
   }
 
   // VISUALIZE TRAVELLED PATHS
@@ -167,7 +271,7 @@ lbu.onData( ( data ) => {
     let streamPoints = coordinatesXYZ[key];
     let pathPoints = [];
 
-    if(streamPoints.length > 1) {
+    if(streamPoints.length > 2) {
       for (let i = 0; i < streamPoints.length; i++) {
         let x = streamPoints[i].x;
         let y = streamPoints[i].y;
@@ -181,7 +285,7 @@ lbu.onData( ( data ) => {
       var path = new THREE.CatmullRomCurve3( pathPoints );
 
       // params
-      var pathSegments = 20;
+      var pathSegments = 10;
       var tubeRadius = 0.2;
       var radiusSegments = 3;
       var closed = false;
@@ -193,11 +297,11 @@ lbu.onData( ( data ) => {
       tubeGeometry = new THREE.BufferGeometry().fromGeometry( tubeGeometry );
       nMax = tubeGeometry.attributes.position.count;
 
-      var splineMat = new THREE.MeshBasicMaterial( {
-        color: 0x0000ff,
+      var splineMat = new MeshLineMaterial( {
+        color: 0x2452c2,
         side: THREE.DoubleSide,
-        transparent: true,
-        wireframe: true
+        transparent: true
+        // wireframe: true
       } );
 
       pathMesh = new THREE.Mesh( tubeGeometry, splineMat );
@@ -207,6 +311,8 @@ lbu.onData( ( data ) => {
   }
 
   // TODO: center connections
+  //
+
 });
 
 function loop(time) { // eslint-disable-line no-unused-vars
