@@ -1,6 +1,6 @@
 /*
   Exported functions:
-
+  
   For use in production:
     init(config)
     setupCodeEntry(opts)
@@ -9,17 +9,17 @@
     setupImageSelect(opts): Promise
     onData(cb): Promise
     upload(opts): Promise
-
+  
   Sample data:
     loadSampleData(): Promise
     sampleLocation(previousPoint, distance): Promise
     samplePic(width, height): Promise
     uploadCode(dotNum): Promise
     sampleUpload(opts): Promise
-    sampleStreamData(opts): Promise
-
+    samplePathData(opts): Promise
+  
   Reset functions:
-    resetStreams(): Promise
+    resetPaths(): Promise
     resetUploads(): Promise
 */
 
@@ -56,24 +56,24 @@ export function setupCodeEntry(opts) {
     digit_buttons: '#keypad button[data-digit]',
     delete_button: '#keypad button.delete'
   };
-
+  
   opts = Object.assign({}, defaults, opts);
-
+  
   function characterForDigit(d) {
     let cp = digits[d][1];
     return String.fromCodePoint(cp);
   }
-
+  
   const input = document.querySelector(opts.code_input);
   const digitButtons = document.querySelectorAll(opts.digit_buttons);
   const deleteButton = document.querySelector(opts.delete_button);
-
+  
   digitButtons.forEach(el => {
     el.addEventListener('mousedown', _e => {
       input.value += characterForDigit(el.dataset.digit);
     });
   });
-
+  
   deleteButton.addEventListener('mousedown', _e => {
     input.value = input.value.slice(0, -1);
   });
@@ -86,19 +86,19 @@ export function setupPopCounter(opts) {
     interval: 1000,
   };
   opts = Object.assign({}, defaults, opts);
-
+  
   const start = 7714100000;
   const persecond = 2.62;
   const date = new Date('2019-07-05');
   const interval = opts.interval;
   const el = document.querySelector(opts.selector)
-
+  
   function update() {
     let diff = Math.round( (new Date() - date)/1000 ) + 1;
     let result = Math.round( diff * persecond + start );
     el.textContent = Number(result).toLocaleString('de');
   }
-
+  
   setInterval(update, interval);
   update();
 }
@@ -111,17 +111,17 @@ export function setupUploadCounter(opts) {
     selector: '#uploadCount'
   }
   opts = Object.assign({}, defaults, opts);
-
+  
   return new Promise((resolve, _reject) => {
-
-    db.doc('_/stats').onSnapshot(snap => {
+    
+    db.doc('stats/stats').onSnapshot(snap => {
       let count = snap.data().uploadCount;
       if (count !== undefined) {
         document.querySelector(opts.selector).textContent = count;
         resolve(count);
       }
     });
-
+    
   });
 }
 
@@ -136,7 +136,7 @@ export async function setupImageSelect(opts, cb) {
   }
   opts = Object.assign({}, defaults, opts);
   let input = document.querySelector(opts.input);
-
+  
   return new Promise(resolve => {
     input.addEventListener('change', e => {
       let file = e.target.files[0];
@@ -159,7 +159,7 @@ export async function setupImageSelect(opts, cb) {
 }
 
 
-// Streams data
+// Paths data
 // Takes an optional callback that is called each time there is an update
 // Returns a promise that resolves with the first data snapshot
 // Data structure:
@@ -172,23 +172,23 @@ export async function setupImageSelect(opts, cb) {
 //   },
 //   last: {
 //     "000": [lat_n, lng_n, ts_n, lat_n-1, lng_n-1, ts_n-1, ...],
-//     "001": ...
+//     "001": ... 
 //      ...
 //     "321":
 //   }
 //   updated: "001"
 // }
-// NOTES:
+// NOTES: 
 //   "integrated": a simplified path for each dot stream (uses simplify.js). last entry are newest
 //   "last": the last n entries with timestamps. first entry is newest
 //   "updated": key of last updated stream
 
 export function onData(cb) {
   return new Promise( (resolve, _reject) => {
-    db.doc('_/streams').onSnapshot(snap => {
-      let streams = snap.data();
-      if (cb instanceof Function) cb(streams);
-      resolve(streams);
+    db.doc('paths/paths').onSnapshot(snap => {
+      let paths = snap.data();
+      if (cb instanceof Function) cb(paths);
+      resolve(paths);
     });
   });
 }
@@ -253,9 +253,9 @@ function getFileMetadata(file) {
 }
 
 // Handle Upload
-//
-// file:       File (https://developer.mozilla.org/en-US/docs/Web/API/File)
-// code:       String eg. '0_0_0_0_0_0', or Ionicon symbols
+// 
+// file:       File (https://developer.mozilla.org/en-US/docs/Web/API/File) 
+// code:       String eg. '0_0_0_0_0_0', or Ionicon symbols 
 // message:    String (optional)
 // onProgress: callback function, called with { bytesTransferred, totalBytes }
 // onLocation: callback function, called with { latitude, longitude, accuracy, timestamp }
@@ -288,12 +288,12 @@ export async function upload(opts) {
     locationOverride: undefined,
   };
   opts = Object.assign({}, defaults, opts);
-
+  
   // Check geolocation browser support
   if (!geolocationSupported()) {
     throw { name:'GeolocationUnsupported', message:'Geolocation feature unsupported in browser' }
   }
-
+  
   // Check file
   if ( !opts.file ) {
     throw { name:'MissingFile', message:'No file provided' }
@@ -307,7 +307,7 @@ export async function upload(opts) {
   if (opts.file.size > FILE_SIZE_LIMIT * 0.99) {
     throw { name:'InvalidFileSize', message:'File size exeeds upload limit' };
   }
-
+  
   // Check code
   if ( opts.code == '' ) {
     throw { name:'MissingCode', message:'No upload code provided' };
@@ -318,7 +318,7 @@ export async function upload(opts) {
   if ( !checkCodeFormat(opts.code) ) {
     throw { name:'InvalidCodeFormat', message:'Invalid code format' };
   }
-
+  
   // Request Location
   let loc = opts.locationOverride;
   if (!loc) {
@@ -337,7 +337,7 @@ export async function upload(opts) {
   if (opts.onLocation instanceof Function) {
     opts.onLocation(loc);
   }
-
+  
   // Upload Data
   let request = {
     message: opts.message,
@@ -358,7 +358,7 @@ export async function upload(opts) {
     }
     throw e;
   }
-
+  
   // Upload File
   const storageRef = storage.ref(`${docRef.id}/${request.photoMetadata.name}`);
   let uploadTaskSnap;
@@ -377,7 +377,7 @@ export async function upload(opts) {
     if (e.code_ == 'storage/unauthorized') throw { name:'UploadSize', message:'Upload size limit exeeded' };
     else throw { name:'UploadError', message:'Error while uploading file', errorObject:e };
   }
-
+  
   return {
     docRef,
     storageRef,
@@ -399,20 +399,21 @@ function getGridCell(lat, lng) {
   lat += 1; // seems data is indexed like this
   if (lat < -90 || lat > 90) return [];
   lat = Math.floor(lat);
-
+  
   while (lng < -180) lng += 360;
   while (lng > 180) lng -= 360;
   lng = Math.floor(lng);
+  
+  const key = 'lat' + (lat<0 ? '-' : '+') + String(Math.abs(lat)).padStart(3, '0') 
+    + '_lng' + (lng<0 ? '-' : '+') + String(Math.abs(lng)).padStart(3, '0');
 
-  const key = 'lat' + (lat<0 ? '-' : '+') + String(lat).padStart(3, '0') + '_lng' + (lng<0 ? '-' : '+') + String(lng).padStart(3, '0');
-  // console.log(key);
   const grid = _sampleData[key];
   return grid;
 }
 
 
 function getGridCellNeighborhood(lat, lng, dist = 1) {
-  dist = Math.floor(dist)
+  dist = Math.floor(dist);
   let data = [];
   for ( let j=lat-dist; j<=lat+dist; j++ ) {
     for ( let i=lng-dist; i<=lng+dist; i++ ) {
@@ -443,10 +444,32 @@ export async function loadSampleData() {
   return _sampleDataPromise;
 }
 
+// Check sample data for non-number values
+export async function checkSampleData() {
+  let sampleData = await loadSampleData();
+  let emptyCount = 0;
+  let problemCount = 0;
+  for (let [key, data] of Object.entries(sampleData)) {
+    if (data.length === 0) emptyCount++;
+    if (data.length % 2 !== 0) {
+      console.warn(`${key}: not a multiple of 2 (${data.length})`);
+      problemCount++;
+    }
+    for (let [idx, val] of data.entries()) {
+      if (typeof val !== 'number') {
+        console.warn(`${key}, index ${idx}: ${val}`);
+        problemCount++;
+      }
+    }
+  }
+  let cells = Object.keys(sampleData).length;
+  console.log(`cells: ${cells}, empty: ${emptyCount} (${(emptyCount/cells*100).toFixed(0)}%), problems: ${problemCount}`,);
+}
+
 export async function sampleLocation(previousPoint, distance = 100) {
   await loadSampleData(); // make sure sample data is loaded
   if (!_sampleData) return; // return undefined if we have no data
-
+  
   if (!previousPoint) {     // get a random point (ignore distance)
     let data;
     while (!data || data.length < 2000) { // find a full grid cell
@@ -457,10 +480,12 @@ export async function sampleLocation(previousPoint, distance = 100) {
     // console.log('picking index', idx)
     return data.slice( idx, idx+2 );
   }
-
+  
   // let data = getGridCell(previousPoint[0], previousPoint[1]);
   const data = getGridCellNeighborhood(previousPoint[0], previousPoint[1], distance / KM_PER_DEG);
-  if (data.length == 0) return;
+  if (data.length == 0) {
+    throw 'Error getting grid data';
+  }
 
   // sort
   const points = [];
@@ -500,7 +525,7 @@ export async function samplePic(width = 1500, height = 1000) {
       ctx.fill();
     }
   }
-
+  
   let blob = await new Promise( resolve => canvas.toBlob(resolve) );
   let timestamp = new Date();
   let name = 'randompic_' + timestamp.toISOString() + '.png';
@@ -519,7 +544,7 @@ export async function uploadCode(dotNum) {
     if (!response.ok) throw { message: 'Request failed', responseObject: response };
     const codes = await response.json();
     if (dotNum < 0 || dotNum > codes.length-1) return;
-    return codes[dotNum];
+    return codes[dotNum]; 
   } catch (err) {
     console.log('Couldn\'t load upload codes');
     return;
@@ -539,25 +564,25 @@ export async function sampleUpload(opts) {
     longitude: undefined,
   };
   opts = Object.assign({}, defaults, opts);
-
+  
   if ( opts.dotNum === undefined || isNaN(opts.dotNum) ) {
     opts.dotNum = Math.floor( 1 + Math.random() * 320 );
   }
-
+  
   if ( opts.distance === undefined || isNaN(opts.distance) ) {
     opts.distance = defaults.distance;
   }
-
+  
   const message = "Hello, sample message " + (new Date()).toISOString() + "!";
   const code = await uploadCode(opts.dotNum);
   const codeSymbols = code.split('_').reduce( (acc, num) => acc + String.fromCodePoint(digits[parseInt(num)][1]), '' );
   const photo = await samplePic();
-
+  
   // Determine location
   const loc = { latitude: 0, longitude: 0, accuracy: 0, timestamp: new Date() };
-  const snap = await db.doc('_/streams').get();
-  const streams = snap.data().last;
-  const dotData = streams[ String(opts.dotNum).padStart(3,'0') ];
+  const snap = await db.doc('paths/paths').get();
+  const paths = snap.data().last;
+  const dotData = paths[ String(opts.dotNum).padStart(3,'0') ]; 
   const previousLoc = dotData ? dotData.slice(0,2) : null;
   let distance;
   if (opts.latitude !== undefined && opts.longitude !== undefined) { // use given location
@@ -578,7 +603,7 @@ export async function sampleUpload(opts) {
     code,
     message,
     locationOverride: loc,
-
+    
     codeSymbols,
     dotNum: opts.dotNum,
     distance,
@@ -593,7 +618,7 @@ export async function sampleUpload(opts) {
 // const SIMPLIFY_TOLERANCE = 0.5; // tolerance setting for simplify.js
 // const SIMPLIFY_THRESHOLD = 25;  // simplify only when more than this amount of points
 const KEEP_LAST = 10;           // how many points to keep in last array
-async function addSampleStream(data, opts) {
+async function addSamplePath(data, opts) {
   const defaults = {
     dotNum: 0,
     startLatitude: undefined, // if undefined and dot has no previous location, picks a random location
@@ -603,10 +628,10 @@ async function addSampleStream(data, opts) {
     steps: 1, // how many points to add
   };
   opts = Object.assign({}, defaults, opts);
-
+  
   data = Object.assign({}, data); // clone data object
-
-  // parameter checks and sanitizing
+  
+  // parameter checks and sanitizing 
   if (opts.steps <= 0) return data;
   if (opts.steps == undefined) { opts.steps = defaults.steps; }
   if (opts.distanceMin == undefined || opts.distanceMin <= 0) { opts.distanceMin = defaults.distanceMin; }
@@ -616,7 +641,7 @@ async function addSampleStream(data, opts) {
     opts.distanceMin = opts.distanceMax;
     opts.distanceMax = help;
   }
-
+  
   let dotkey = opts.dotNum.toString().padStart(3, '0');
   console.log('ADDING TO STREAM', dotkey, '(' + opts.steps + ' steps)')
   // determine start location (given, from previous, random)
@@ -632,7 +657,7 @@ async function addSampleStream(data, opts) {
       console.log('  previous location:', last[0], last[1], "start at:", loc[0], loc[1]);
     } else {
       // get a random start location
-      let loc = await sampleLocation();
+      let loc = await sampleLocation(); 
       opts.startLatitude  = loc[0];
       opts.startLongitude = loc[1];
       console.log('  start at random location:', loc[0], loc[1]);
@@ -640,10 +665,10 @@ async function addSampleStream(data, opts) {
   } else {
     console.log('  start at forced location:', opts.startLatitude, opts.startLongitude);
   }
-
+  
   // generate stream of locations
   let locs = [opts.startLatitude, opts.startLongitude];
-  if (opts.steps <= 0) opts.steps = 1;
+  if (opts.steps <= 0) opts.steps = 1; 
   for (let i=0; i<opts.steps-1; i++) {
     let dist = Math.floor( opts.distanceMin + Math.random() * (opts.distanceMax - opts.distanceMin) );
     let prevLoc = locs.slice(i*2, i*2+2);
@@ -651,12 +676,12 @@ async function addSampleStream(data, opts) {
     loc = loc.slice(0, 2);
     locs.push(...loc);
   }
-
+  
   // integrated property
   let integrated = data.integrated[dotkey] || [];
   integrated.push(...locs);
   data.integrated[dotkey] = integrated;
-
+  
   // last property
   let last = data.last[dotkey] || [];
   for (let i=0; i<locs.length; i+=2) {
@@ -664,16 +689,16 @@ async function addSampleStream(data, opts) {
   }
   last = last.slice(0, KEEP_LAST*3);
   data.last[dotkey] = last;
-
+  
   // last updated property
   data.updated = dotkey;
-
+  
   return data;
 }
 
 // Add sample data to the stream, without going through the normal upload process
 // Note: This just adds data to the integrated stream, without simplifying
-export async function sampleStreamData(opts) {
+export async function samplePathData(opts) {
   const defaults = {
     dotNum: undefined, // if undefined, picks a random dot
     startLatitude: undefined, // if undefined and dot has no previous location, picks a random location
@@ -686,15 +711,15 @@ export async function sampleStreamData(opts) {
   if ( opts.dotNum === undefined || opts.dotNum === null || isNaN(opts.dotNum) ) {
     opts.dotNum = Math.floor( 1 + Math.random() * 320 );
   }
-
-  let data = (await db.doc('_/streams').get()).data();
-  data = await addSampleStream(data, opts);
+  
+  let data = (await db.doc('paths/paths').get()).data();
+  data = await addSamplePath(data, opts);
   // console.log(data);
-  return db.doc('_/streams').set(data);
+  return db.doc('paths/paths').set(data);
 }
 
-// Add sample Data to multiple streams simultaneously
-export async function sampleStreamDataMultiple(opts) {
+// Add sample Data to multiple paths simultaneously
+export async function samplePathDataMultiple(opts) {
   const defaults = {
     startDot: 1,
     endDot: 10,
@@ -704,35 +729,36 @@ export async function sampleStreamDataMultiple(opts) {
     stepChance: 1,
   };
   opts = Object.assign({}, defaults, opts);
-
+  
   if (opts.startDot > opts.endDot) {
     let help = opts.startDot;
     opts.startDot = opts.endDot;
     opts.endDot = help;
   }
-
+  
   if (opts.startDot < 0 || opts.startDot > 321 || opts.endDot < 0 || opts.endDot > 321) {
     console.warn('sampleScatterData: Invalid startDot / endDot parameters');
     return;
   }
-
-  let data = (await db.doc('_/streams').get()).data();
-
+  
+  let data = (await db.doc('paths/paths').get()).data();
+  
   for (let dotNum = opts.startDot; dotNum <= opts.endDot; dotNum++) {
-    // how many steps to add to this dot stream
+    // how many steps to add to this dot stream 
     let steps = 0;
     for (let i=0; i<opts.steps; i++) { if (Math.random() < opts.stepChance) steps++; }
     // add to dot stream
-    data = await addSampleStream(data, {
+    data = await addSamplePath(data, {
       dotNum,
       distanceMin: opts.distanceMin,
       distanceMax: opts.distanceMax,
       steps,
     });
   }
-
+  
   // update data
-  return db.doc('_/streams').set(data);
+  console.log('setting data', data);
+  return db.doc('paths/paths').set(data);
 }
 
 
@@ -742,12 +768,12 @@ export async function sampleStreamDataMultiple(opts) {
  * Note: Needs rules enabled in firestore.rules and storage.rules
 */
 
-// Reset streams document to empty state
-export async function resetStreams() {
-  return db.doc('_/streams').set({
+// Reset paths document to empty state
+export async function resetPaths() {
+  return db.doc('paths/paths').set({
     integrated: {}, last: {}, updated: ''
   }).then(() => {
-    console.log('COMPLETED resetStreams');
+    console.log('COMPLETED resetPaths');
   });
 }
 
@@ -757,17 +783,17 @@ export async function resetUploads() {
   await deleteCollection(db, 'uploads', 100).then(() => {
     console.log('  Note: Deleted uploads collection');
   });
-
+  
   // delete storage
   // needs list and delete permissions (write)
   let result = await storage.ref('/').listAll();
   let folderRefs = result.prefixes;
-
+  
   let filePromises = folderRefs.map(ref => ref.listAll());
-
+  
   result = await Promise.all(filePromises);
   let fileRefs = result.reduce((acc, res) => acc.concat(res.items), []);
-
+  
   let deletePromises = fileRefs.map(ref => ref.delete());
   return Promise.all(deletePromises).then(() => {
     console.log('  Note: Deleted images in storage bucket');
