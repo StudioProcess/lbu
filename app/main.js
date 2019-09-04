@@ -77,7 +77,7 @@ renderer.setPixelRatio( window.devicePixelRatio );
 scene = new THREE.Scene();
 camera = new THREE.PerspectiveCamera( 75, W / H, 0.01, 1000 );
 controls = new OrbitControls( camera, renderer.domElement );
-// camera.position.z = 30;
+camera.position.y = 150;
 
 // always returns a random number between min and max (both included)
 function getRndInteger(min, max) {
@@ -112,41 +112,25 @@ lbu.onData( ( data ) => {
 
       if (lon <= minLon) { minLon = lon; }
       if (lon >= maxLon) { maxLon = lon; }
-
-      // originalLat.push(lat);
-      // originalLon.push(lon);
-      //
-      // numberOfCoords++;
       u++;
     }
-    // console.log("minLat: "+ minLat);
-    // console.log("maxLat: "+ maxLat);
-    // console.log("minLon: "+ minLon);
-    // console.log("maxLon: "+ maxLon);
-    // noPointsPerStream[key] = points.length/2;
   }
 
-  let indexOfStream = 0;
-  for (let key of Object.keys(data.integrated)) {
-    let points = data.integrated[key];
-    // let tempMappedLat = [];
-    // let tempMappedLon = [];
-    let tempMappedLatLon = [];
-
-    for(let t = 1; t < points.length-1; t++) {
-      // console.log ( minLat );
-      let lat = data.integrated[key][t].map(minLat, maxLat, -90, 90);
-      let lon = data.integrated[key][t+1].map(minLon, maxLon, -180, 180);
-
-      // tempMappedLatLon.push();
-      tempMappedLatLon.push( data.integrated[key][t].map(minLat, maxLat, -90, 90) );
-      tempMappedLatLon.push( data.integrated[key][t+1].map(minLon, maxLon, -180, 180) );
-    }
-
-    mappedLatLon.splice(indexOfStream, 0, tempMappedLatLon);
-    // mappedLon.splice(indexOfStream, 0, tempMappedLon);
-    indexOfStream++;
-  }
+  // let indexOfStream = 0;
+  // for (let key of Object.keys(data.integrated)) {
+  //   let points = data.integrated[key];
+  //   let tempLatLon = [];
+  //
+  //   for(let t = 1; t < points.length-1; t++) {
+  //     let lat = data.integrated[key][t];
+  //     let lon = data.integrated[key][t+1];
+  //     tempLatLon.push( lat );
+  //     tempLatLon.push( lon );
+  //   }
+  //
+  //   mappedLatLon.splice(indexOfStream, 0, tempLatLon);
+  //   indexOfStream++;
+  // }
 
   // console.log( mappedLatLon );
 
@@ -208,7 +192,10 @@ lbu.onData( ( data ) => {
         let y = rad * cosLat * sinLon;
         let z = rad * sinLat;
 
-        coordinatesOnStream.push( {x: x, y: y, z: z} );
+        let xOffSet = 0;//dist(lat, 0);
+        let yOffSet = 0;//dist(lon, 0);
+        // if(t == 0) { coordinatesOnStream.push( {x: 0, y: 0, z: 0} ); }
+        coordinatesOnStream.push( {x: x, y: y, z: t} );
       }
       coordinatesXYZ.splice(noOfPoint, 0, coordinatesOnStream);
       noOfPoint++;
@@ -320,48 +307,48 @@ lbu.onData( ( data ) => {
 
   // center connections
   //
-  let centerIndex = 0;
-  for (let key of Object.keys(coordinatesXYZ)) {
-
-    let index = coordinatesXYZ[key].length;
-    let pathMeshCenter;
-
-    if((coordinatesXYZ[key].length) > 0){
-      let x = coordinatesXYZ[key][index-1].x;
-      let y = coordinatesXYZ[key][index-1].y;
-      let z = coordinatesXYZ[key][index-1].z;
-
-      let pathPointsCenter = [];
-
-      pathPointsCenter.push ( new THREE.Vector3(x,y,z) );
-      pathPointsCenter.push ( new THREE.Vector3(0,0,0) );
-
-      // path
-      var centerPath = new THREE.CatmullRomCurve3( pathPointsCenter );
-
-      // params
-      // geometry
-      let tubeGeometryCenter = new THREE.TubeGeometry( centerPath, 300, 0.05, radiusSegments, closed );
-
-      // to buffer goemetry
-      tubeGeometryCenter = new THREE.BufferGeometry().fromGeometry( tubeGeometryCenter );
-      // nMax = tubeGeometryCenter.attributes.position.count;
-      // console.log( "poly count: "+tubeGeometryCenter.attributes.position.count );
-
-      var splineMatCenter = new MeshLineMaterial( {
-        color: projectColors[centerIndex%projectColors.length],
-        side: THREE.DoubleSide,
-        transparent: true
-        // wireframe: true
-      } );
-
-      pathMeshCenter = new THREE.Mesh( tubeGeometryCenter, splineMatCenter );
-      centerMeshes.push( pathMeshCenter );
-      scene.add( pathMeshCenter );
-
-      centerIndex++;
-    }
-  }
+  // let centerIndex = 0;
+  // for (let key of Object.keys(coordinatesXYZ)) {
+  //
+  //   let index = coordinatesXYZ[key].length;
+  //   let pathMeshCenter;
+  //
+  //   if((coordinatesXYZ[key].length) > 0){
+  //     let x = coordinatesXYZ[key][index-1].x;
+  //     let y = coordinatesXYZ[key][index-1].y;
+  //     let z = coordinatesXYZ[key][index-1].z;
+  //
+  //     let pathPointsCenter = [];
+  //
+  //     pathPointsCenter.push ( new THREE.Vector3(x,y,z) );
+  //     pathPointsCenter.push ( new THREE.Vector3(0,0,0) );
+  //
+  //     // path
+  //     var centerPath = new THREE.CatmullRomCurve3( pathPointsCenter );
+  //
+  //     // params
+  //     // geometry
+  //     let tubeGeometryCenter = new THREE.TubeGeometry( centerPath, 300, 0.05, radiusSegments, closed );
+  //
+  //     // to buffer goemetry
+  //     tubeGeometryCenter = new THREE.BufferGeometry().fromGeometry( tubeGeometryCenter );
+  //     // nMax = tubeGeometryCenter.attributes.position.count;
+  //     // console.log( "poly count: "+tubeGeometryCenter.attributes.position.count );
+  //
+  //     var splineMatCenter = new MeshLineMaterial( {
+  //       color: projectColors[centerIndex%projectColors.length],
+  //       side: THREE.DoubleSide,
+  //       transparent: true
+  //       // wireframe: true
+  //     } );
+  //
+  //     pathMeshCenter = new THREE.Mesh( tubeGeometryCenter, splineMatCenter );
+  //     centerMeshes.push( pathMeshCenter );
+  //     scene.add( pathMeshCenter );
+  //
+  //     centerIndex++;
+  //   }
+  // }
 
 });
 
@@ -372,6 +359,7 @@ function loop(time) { // eslint-disable-line no-unused-vars
   var speed = Date.now() * 0.00005;
   camera.position.x = Math.cos(speed) * 60;
   camera.position.z = Math.sin(speed) * 60;
+  camera.position.y = Math.tan(speed) * 10;
   camera.lookAt(scene.position);
 
   requestAnimationFrame( loop );
@@ -428,6 +416,10 @@ function initPageElements() {
     document.getElementById("uploadlabel").innerHTML = 'Replace photo...';
     console.log('image selected', e);
   });
+}
+
+function dist(p0, p1) {
+  return Math.sqrt( p0*p0 + p1*p1, 2);
 }
 
 function initUpload() {
