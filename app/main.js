@@ -197,7 +197,7 @@ lbu.onData( ( data ) => {
         let xOffSet = 0;//dist(lat, 0);
         let yOffSet = dist(lon, 0);
         // if(t == 0) { coordinatesOnStream.push( {x: 0, y: 0, z: 0} ); }
-        coordinatesOnStream.push( {x: x, y: t, z: z} );
+        coordinatesOnStream.push( {x: x, y: t, z: z} ); // change to {x: x, y: y, z: z} for globe view
       }
       coordinatesXYZ.splice(noOfPoint, 0, coordinatesOnStream);
       noOfPoint++;
@@ -302,7 +302,7 @@ lbu.onData( ( data ) => {
         // wireframe: true
       } );
 
-      nStep.push(getRndInteger(1000, 10000)*0.001);
+      nStep.push(getRndInteger(1000, 20000)*0.001);
       nEnd.push(0);
       nMax.push(2400);
       pathCounter++;
