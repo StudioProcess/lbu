@@ -27,8 +27,8 @@ let pathMesh;
 let pathMeshes = [];
 let centerMeshes = [];
 let nEnd = 0;
-let nMax = 5400;
-let nStep = 4; // animation speed
+let nMax = 2400;
+let nStep = 5; // animation speed
 
 var Params = function() {
   this.curves = true;
@@ -248,7 +248,7 @@ lbu.onData( ( data ) => {
 
       let mesh = new THREE.Mesh( dotGeo, mat );
       mesh.position.set(x, y, z);
-      scene.add( mesh );
+      // scene.add( mesh );
 
       indexSpehere++;
 
@@ -279,9 +279,9 @@ lbu.onData( ( data ) => {
       var path = new THREE.CatmullRomCurve3( pathPoints );
 
       // params
-      var pathSegments = 10;
+      var pathSegments = 100;
       var tubeRadius = 0.2;
-      var radiusSegments = 5;
+      var radiusSegments = 4;
       var closed = false;
 
       // geometry
@@ -290,6 +290,7 @@ lbu.onData( ( data ) => {
       // to buffer goemetry
       tubeGeometry = new THREE.BufferGeometry().fromGeometry( tubeGeometry );
       // nMax = tubeGeometry.attributes.position.count;
+      // console.log( tubeGeometry.attributes.position.count );
 
       var splineMat = new MeshLineMaterial( {
         color: projectColors[indexPaths%projectColors.length],
@@ -359,9 +360,9 @@ function loop(time) { // eslint-disable-line no-unused-vars
   var speed = Date.now() * 0.00005;
   // camera.position.x = Math.cos(speed) * 40;
   // camera.position.z = Math.sin(speed) * 40;
-  camera.position.x = 40;
-  camera.position.y = 60 + Math.cos(Math.sin(speed) * 60);
-  camera.position.z = 20;
+  camera.position.x = 20;
+  camera.position.y = 10;// + Math.cos(Math.sin(speed) * 60);
+  camera.position.z = 50;
   // camera.position.y = Math.cos(Math.sin(speed) * 60);
   camera.lookAt(scene.position);
 
@@ -370,7 +371,7 @@ function loop(time) { // eslint-disable-line no-unused-vars
 
   if(increasing) {
     nEnd = ( nEnd + nStep );
-    if(nEnd >= nMax*0.5) {
+    if(nEnd >= nMax) {
       increasing = false;
       console.log("max reached");
     }
@@ -383,8 +384,8 @@ function loop(time) { // eslint-disable-line no-unused-vars
     }
   }
 
-  for(let u=0; u < centerMeshes.length; u++){
-    centerMeshes[u].geometry.setDrawRange( 0, nEnd+u*2 );
+  for(let u=0; u < pathMeshes.length; u++){
+    pathMeshes[u].geometry.setDrawRange( 0, nEnd+u*2 );
   }
 
   renderer.render( scene, camera );
