@@ -193,9 +193,9 @@ lbu.onData( ( data ) => {
         let z = rad * sinLat;
 
         let xOffSet = 0;//dist(lat, 0);
-        let yOffSet = 0;//dist(lon, 0);
+        let yOffSet = dist(lon, 0);
         // if(t == 0) { coordinatesOnStream.push( {x: 0, y: 0, z: 0} ); }
-        coordinatesOnStream.push( {x: x, y: y, z: t} );
+        coordinatesOnStream.push( {x: x, y: t, z: z} );
       }
       coordinatesXYZ.splice(noOfPoint, 0, coordinatesOnStream);
       noOfPoint++;
@@ -281,7 +281,7 @@ lbu.onData( ( data ) => {
       // params
       var pathSegments = 10;
       var tubeRadius = 0.2;
-      var radiusSegments = 3;
+      var radiusSegments = 5;
       var closed = false;
 
       // geometry
@@ -357,9 +357,12 @@ function loop(time) { // eslint-disable-line no-unused-vars
 
   //using timer as animation
   var speed = Date.now() * 0.00005;
-  camera.position.x = Math.cos(speed) * 60;
-  camera.position.z = Math.sin(speed) * 60;
-  camera.position.y = Math.tan(speed) * 10;
+  // camera.position.x = Math.cos(speed) * 40;
+  // camera.position.z = Math.sin(speed) * 40;
+  camera.position.x = 40;
+  camera.position.y = 60 + Math.cos(Math.sin(speed) * 60);
+  camera.position.z = 20;
+  // camera.position.y = Math.cos(Math.sin(speed) * 60);
   camera.lookAt(scene.position);
 
   requestAnimationFrame( loop );
