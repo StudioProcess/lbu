@@ -26,9 +26,11 @@ let projectColors = [ '#ce3b43', '#2452c2', '#f2c200', '#b94db3', '#9bcfe4', '#b
 let pathMesh;
 let pathMeshes = [];
 let centerMeshes = [];
-let nEnd = 0;
-let nMax = 2400;
-let nStep = 3; // animation speed
+let nEnd = [];
+let nMax = [];
+// let nMax = 2400;
+let nStep = []; // animation speed
+let increasing = [];
 
 var Params = function() {
   this.curves = true;
@@ -264,7 +266,7 @@ lbu.onData( ( data ) => {
     // get points on current stream
     let streamPoints = coordinatesXYZ[key];
     let pathPoints = [];
-
+    let pathCounter = 0;
     if(streamPoints.length > 2) {
       for (let i = 0; i < streamPoints.length; i++) {
         let x = streamPoints[i].x;
@@ -296,12 +298,17 @@ lbu.onData( ( data ) => {
         color: projectColors[indexPaths%projectColors.length],
         side: THREE.DoubleSide,
         transparent: true,
-        opacity: 0.6
+        opacity: 1.0
         // wireframe: true
       } );
 
+      nStep.push(getRndInteger(1000, 10000)*0.001);
+      nEnd.push(0);
+      nMax.push(2400);
+      pathCounter++;
       pathMesh = new THREE.Mesh( tubeGeometry, splineMat );
       pathMeshes.push( pathMesh );
+      increasing.push(true);
       scene.add( pathMesh );
     }
     indexPaths++;
@@ -354,46 +361,97 @@ lbu.onData( ( data ) => {
 
 });
 
-let increasing = true;
+let cameraX = 20;
+let cameraY = 10;
+let cameraZ = 50;
+let viewMode = 1;
 function loop(time) { // eslint-disable-line no-unused-vars
 
   //using timer as animation
   var speed = Date.now() * 0.00005;
   // camera.position.x = Math.cos(speed) * 40;
   // camera.position.z = Math.sin(speed) * 40;
-  camera.position.x = 20;
-  camera.position.y = 10;
-  camera.position.z = 50;
+  camera.position.x = cameraX;
+  camera.position.y = cameraY;
+  camera.position.z = cameraZ;
 
   scene.rotation.x = Math.cos(speed) * 0.1;
   scene.rotation.y = Math.cos(speed);
-  // camera.position.y = Math.cos(Math.sin(speed) * 60);
+
+  // if(viewMode == 1) {
+  //   scene.rotation.x = Math.cos(speed) * 0.1;
+  //   scene.rotation.y = Math.cos(speed);
+  // } else if(viewMode == 2) {
+  //   scene.rotation.x = Math.cos(speed) * 0.1;
+  //   scene.rotation.y = Math.tan(speed);
+  // } else if (viewMode == 3) {
+  //   scene.rotation.x = Math.sin(speed) * 0.1;
+  //   scene.rotation.y = Math.cos(speed);
+  // }
+
   camera.lookAt(scene.position);
 
   requestAnimationFrame( loop );
   // console.log( nEnd );
 
-  if(increasing) {
-    nEnd = ( nEnd + nStep );
-    if(nEnd >= nMax) {
-      increasing = false;
-      console.log("max reached");
-    }
-
-  } else {
-    nEnd = ( nEnd - nStep );
-    if(nEnd <= nEnd*0.1) {
-      increasing = true;
-      console.log("min reached");
-    }
-  }
-
   for(let u=0; u < pathMeshes.length; u++){
-    pathMeshes[u].geometry.setDrawRange( 0, nEnd+u*3 );
+
+    if(increasing[u]) {
+      nEnd[u] = ( nEnd[u] + nStep[u] );
+      if(nEnd[u] >= nMax[u]) {
+        increasing[u] = false;
+        console.log("max reached");
+      }
+
+    } else {
+      nEnd[u] = ( nEnd[u] - nStep[u] );
+      if(nEnd[u] <= nEnd[u]*0.1) {
+        increasing[u] = true;
+        console.log("min reached");
+      }
+    }
+    pathMeshes[u].geometry.setDrawRange( 0, nEnd[u]+u*3+1 );
+    console.log( nEnd[u]+u*3 );
+
+
   }
 
   renderer.render( scene, camera );
 }
+
+document.addEventListener('keydown', e => {
+  // console.log(e.key, e.keyCode, e);
+
+  // if (e.key == 'f') { // f .. fullscreen
+  //   util.toggleFullscreen();
+  // }
+
+  if (e.key == '1') {
+    cameraX = 20;
+    cameraY = 10;
+    cameraZ = 50;
+    viewMode = 1;
+  }
+
+  else if(e.key == '2') {
+    cameraX = 0;
+    cameraY = 60;
+    cameraZ = 0;
+    viewMode = 2;
+  }
+
+  else if(e.key == '3') {
+    cameraX = 15;
+    cameraY = 12;
+    cameraZ = 20;
+    viewMode = 3;
+  }
+
+  // else if (e.key == 's') {
+  //   util.saveCanvas();
+  // }
+
+});
 
 function initLibrary() {
   // Initialize LBU Library
