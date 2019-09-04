@@ -25,7 +25,10 @@ let projectColors = [ '#ce3b43', '#2452c2', '#f2c200', '#b94db3', '#9bcfe4', '#b
 
 let pathMesh;
 let pathMeshes = [];
-var nEnd = 0, nMax, nStep = 90; // 30 faces * 3 vertices/face
+let centerMeshes = [];
+let nEnd = 0;
+let nMax = 5400;
+let nStep = 4; // animation speed
 
 var Params = function() {
   this.curves = true;
@@ -74,7 +77,7 @@ renderer.setPixelRatio( window.devicePixelRatio );
 scene = new THREE.Scene();
 camera = new THREE.PerspectiveCamera( 75, W / H, 0.01, 1000 );
 controls = new OrbitControls( camera, renderer.domElement );
-camera.position.z = 70;
+// camera.position.z = 30;
 
 // always returns a random number between min and max (both included)
 function getRndInteger(min, max) {
@@ -218,12 +221,13 @@ lbu.onData( ( data ) => {
 
   // LAST POINT AS SPHERES
   // last positions sphere: last position is added at end of array
+  let indexSpehere = 0;
   for (let key of Object.keys(coordinatesXYZ)) {
     // get last coordinate
     let index = coordinatesXYZ[key].length;
     // coordinatesXYZ[key][index-1].x
     // place sphere
-    console.log( coordinatesXYZ[key].length );
+    // console.log( coordinatesXYZ[key].length );
     if((coordinatesXYZ[key].length) > 0){
       let x = coordinatesXYZ[key][index-1].x;
       let y = coordinatesXYZ[key][index-1].y;
@@ -238,7 +242,7 @@ lbu.onData( ( data ) => {
 
       mat = new MeshLineMaterial( {
         useMap: params.strokes,
-        color: new THREE.Color( 0xff6666 ),
+        color: new THREE.Color( projectColors[indexSpehere%projectColors.length] ),
         opacity: params.strokes ? .5 : 1,
         dashArray: params.dashArray,
         dashOffset: params.dashOffset,
@@ -259,12 +263,15 @@ lbu.onData( ( data ) => {
       mesh.position.set(x, y, z);
       scene.add( mesh );
 
+      indexSpehere++;
+
     }
     //
 
   }
 
   // VISUALIZE TRAVELLED PATHS
+  let indexPaths = 0;
   for (let key of Object.keys(coordinatesXYZ)) {
 
     // get points on current stream
@@ -295,10 +302,10 @@ lbu.onData( ( data ) => {
 
       // to buffer goemetry
       tubeGeometry = new THREE.BufferGeometry().fromGeometry( tubeGeometry );
-      nMax = tubeGeometry.attributes.position.count;
+      // nMax = tubeGeometry.attributes.position.count;
 
       var splineMat = new MeshLineMaterial( {
-        color: 0x2452c2,
+        color: projectColors[indexPaths%projectColors.length],
         side: THREE.DoubleSide,
         transparent: true
         // wireframe: true
@@ -307,14 +314,58 @@ lbu.onData( ( data ) => {
       pathMesh = new THREE.Mesh( tubeGeometry, splineMat );
       pathMeshes.push( pathMesh );
       scene.add( pathMesh );
+      indexPaths++;
     }
   }
 
-  // TODO: center connections
+  // center connections
   //
+  let centerIndex = 0;
+  for (let key of Object.keys(coordinatesXYZ)) {
+
+    let index = coordinatesXYZ[key].length;
+    let pathMeshCenter;
+
+    if((coordinatesXYZ[key].length) > 0){
+      let x = coordinatesXYZ[key][index-1].x;
+      let y = coordinatesXYZ[key][index-1].y;
+      let z = coordinatesXYZ[key][index-1].z;
+
+      let pathPointsCenter = [];
+
+      pathPointsCenter.push ( new THREE.Vector3(x,y,z) );
+      pathPointsCenter.push ( new THREE.Vector3(0,0,0) );
+
+      // path
+      var centerPath = new THREE.CatmullRomCurve3( pathPointsCenter );
+
+      // params
+      // geometry
+      let tubeGeometryCenter = new THREE.TubeGeometry( centerPath, 300, 0.05, radiusSegments, closed );
+
+      // to buffer goemetry
+      tubeGeometryCenter = new THREE.BufferGeometry().fromGeometry( tubeGeometryCenter );
+      // nMax = tubeGeometryCenter.attributes.position.count;
+      // console.log( "poly count: "+tubeGeometryCenter.attributes.position.count );
+
+      var splineMatCenter = new MeshLineMaterial( {
+        color: projectColors[centerIndex%projectColors.length],
+        side: THREE.DoubleSide,
+        transparent: true
+        // wireframe: true
+      } );
+
+      pathMeshCenter = new THREE.Mesh( tubeGeometryCenter, splineMatCenter );
+      centerMeshes.push( pathMeshCenter );
+      scene.add( pathMeshCenter );
+
+      centerIndex++;
+    }
+  }
 
 });
 
+let increasing = true;
 function loop(time) { // eslint-disable-line no-unused-vars
 
   //using timer as animation
@@ -324,11 +375,27 @@ function loop(time) { // eslint-disable-line no-unused-vars
   camera.lookAt(scene.position);
 
   requestAnimationFrame( loop );
+  // console.log( nEnd );
 
-  nEnd = ( nEnd + nStep ) % nMax;
-  // for(let u=0; u < pathMeshes.length; u++){
-  //   pathMeshes[u].geometry.setDrawRange( 0, nEnd );
-  // }
+  if(increasing) {
+    nEnd = ( nEnd + nStep );
+    if(nEnd >= nMax*0.5) {
+      increasing = false;
+      console.log("max reached");
+    }
+
+  } else {
+    nEnd = ( nEnd - nStep );
+    if(nEnd <= nEnd*0.1) {
+      increasing = true;
+      console.log("min reached");
+    }
+  }
+
+  for(let u=0; u < centerMeshes.length; u++){
+    centerMeshes[u].geometry.setDrawRange( 0, nEnd+u*2 );
+  }
+
   renderer.render( scene, camera );
 }
 
