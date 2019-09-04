@@ -28,7 +28,7 @@ let pathMeshes = [];
 let centerMeshes = [];
 let nEnd = 0;
 let nMax = 2400;
-let nStep = 5; // animation speed
+let nStep = 3; // animation speed
 
 var Params = function() {
   this.curves = true;
@@ -248,7 +248,7 @@ lbu.onData( ( data ) => {
 
       let mesh = new THREE.Mesh( dotGeo, mat );
       mesh.position.set(x, y, z);
-      // scene.add( mesh );
+      scene.add( mesh );
 
       indexSpehere++;
 
@@ -280,12 +280,12 @@ lbu.onData( ( data ) => {
 
       // params
       var pathSegments = 100;
-      var tubeRadius = 0.2;
+      var tubeRadius = 0.1;
       var radiusSegments = 4;
       var closed = false;
 
       // geometry
-      let tubeGeometry = new THREE.TubeGeometry( path, pathSegments, tubeRadius, radiusSegments, closed );
+      let tubeGeometry = new THREE.TubeGeometry( path, pathSegments, tubeRadius+(indexPaths*0.01)%0.2, radiusSegments, closed );
 
       // to buffer goemetry
       tubeGeometry = new THREE.BufferGeometry().fromGeometry( tubeGeometry );
@@ -295,15 +295,16 @@ lbu.onData( ( data ) => {
       var splineMat = new MeshLineMaterial( {
         color: projectColors[indexPaths%projectColors.length],
         side: THREE.DoubleSide,
-        transparent: true
+        transparent: true,
+        opacity: 0.6
         // wireframe: true
       } );
 
       pathMesh = new THREE.Mesh( tubeGeometry, splineMat );
       pathMeshes.push( pathMesh );
       scene.add( pathMesh );
-      indexPaths++;
     }
+    indexPaths++;
   }
 
   // center connections
@@ -361,8 +362,11 @@ function loop(time) { // eslint-disable-line no-unused-vars
   // camera.position.x = Math.cos(speed) * 40;
   // camera.position.z = Math.sin(speed) * 40;
   camera.position.x = 20;
-  camera.position.y = 10;// + Math.cos(Math.sin(speed) * 60);
+  camera.position.y = 10;
   camera.position.z = 50;
+
+  scene.rotation.x = Math.cos(speed) * 0.1;
+  scene.rotation.y = Math.cos(speed);
   // camera.position.y = Math.cos(Math.sin(speed) * 60);
   camera.lookAt(scene.position);
 
@@ -385,7 +389,7 @@ function loop(time) { // eslint-disable-line no-unused-vars
   }
 
   for(let u=0; u < pathMeshes.length; u++){
-    pathMeshes[u].geometry.setDrawRange( 0, nEnd+u*2 );
+    pathMeshes[u].geometry.setDrawRange( 0, nEnd+u*3 );
   }
 
   renderer.render( scene, camera );
