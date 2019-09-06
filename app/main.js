@@ -281,7 +281,7 @@ lbu.onData( ( data ) => {
       var path = new THREE.CatmullRomCurve3( pathPoints );
 
       // params
-      var pathSegments = 100;
+      var pathSegments = 50;
       var tubeRadius = 0.1;
       var radiusSegments = 4;
       var closed = false;
@@ -306,7 +306,7 @@ lbu.onData( ( data ) => {
       let dotGeo = null;
       let mat = null;
 
-      dotGeo = new THREE.SphereGeometry( objectSize/2, 5, 5 );
+      dotGeo = new THREE.SphereGeometry( objectSize/4, 5, 5 );
 
       mat = new MeshLineMaterial( {
         useMap: params.strokes,
