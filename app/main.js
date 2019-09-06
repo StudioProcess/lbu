@@ -96,7 +96,7 @@ let maxLon = -90;
 let mappedLat = [];
 let mappedLon = [];
 let mappedLatLon = [];
-// get data, copy object for further usage
+
 lbu.onData( ( data ) => {
   // add points of each stream as array to coordinates
   // in data.last sind nur letzten (genauer) -> eventl. nicht verwenden
@@ -302,6 +302,37 @@ lbu.onData( ( data ) => {
         // wireframe: true
       } );
 
+      // SPEHERES ON PREVIOUS POSITIONS
+      let dotGeo = null;
+      let mat = null;
+
+      dotGeo = new THREE.SphereGeometry( objectSize/2, 5, 5 );
+
+      mat = new MeshLineMaterial( {
+        useMap: params.strokes,
+        color: new THREE.Color( projectColors[indexPaths%projectColors.length] ),
+        opacity: params.strokes ? .5 : 1,
+        dashArray: params.dashArray,
+        dashOffset: params.dashOffset,
+        dashRatio: params.dashRatio,
+        resolution: resolution,
+        sizeAttenuation: params.sizeAttenuation,
+        lineWidth: centerConnectionWidth,
+        near: camera.near,
+        far: camera.far,
+        depthWrite: false,
+        depthTest: !params.strokes,
+        alphaTest: .5,//params.strokes ? .5 : 0,
+        transparent: true,
+        side: THREE.DoubleSide
+      });
+
+      for(let j = 0; j < pathPoints.length; j++) {
+        let mesh = new THREE.Mesh( dotGeo, mat );
+        mesh.position.set(pathPoints[j].x, pathPoints[j].y, pathPoints[j].z);
+        scene.add( mesh );
+      }
+
       nStep.push(getRndInteger(1000, 20000)*0.001);
       nEnd.push(0);
       nMax.push(2400);
@@ -313,6 +344,9 @@ lbu.onData( ( data ) => {
     }
     indexPaths++;
   }
+
+  // SPHERES FOR PREVIOUS POSITIONS
+
 
   // center connections
   //
@@ -375,6 +409,8 @@ function loop(time) { // eslint-disable-line no-unused-vars
   camera.position.y = cameraY;
   camera.position.z = cameraZ;
 
+  scene.position.y = -15;
+
   scene.rotation.x = Math.cos(speed) * 0.1;
   scene.rotation.y = Math.cos(speed);
 
@@ -400,24 +436,31 @@ function loop(time) { // eslint-disable-line no-unused-vars
       nEnd[u] = ( nEnd[u] + nStep[u] );
       if(nEnd[u] >= nMax[u]) {
         increasing[u] = false;
-        console.log("max reached");
+        // console.log("max reached");
       }
 
     } else {
       nEnd[u] = ( nEnd[u] - nStep[u] );
       if(nEnd[u] <= nEnd[u]*0.1) {
         increasing[u] = true;
-        console.log("min reached");
+        // console.log("min reached");
       }
     }
     pathMeshes[u].geometry.setDrawRange( 0, nEnd[u]+u*3+1 );
-    console.log( nEnd[u]+u*3 );
+    // console.log( nEnd[u]+u*3 );
 
 
   }
 
   renderer.render( scene, camera );
 }
+
+
+// create some object to save all pressed keys
+var keys = {
+  s: false,
+  alt: false
+};
 
 document.addEventListener('keydown', e => {
   // console.log(e.key, e.keyCode, e);
@@ -447,8 +490,9 @@ document.addEventListener('keydown', e => {
     viewMode = 3;
   }
 
-  // else if (e.key == 's') {
+  // else if (e.key == 'Dead') {
   //   util.saveCanvas();
+  //   console.log ("screenshot saved.");
   // }
 
 });
