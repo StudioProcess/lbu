@@ -23,15 +23,6 @@ var resolution = new THREE.Vector2( window.innerWidth, window.innerHeight );
 
 let projectColors = [ '#ce3b43', '#2452c2', '#f2c200', '#b94db3', '#9bcfe4', '#b7b5a8', '#CCCCCC', '#CCDEFF' ];
 
-let pathMesh;
-let pathMeshes = [];
-let centerMeshes = [];
-let nEnd = [];
-let nMax = [];
-// let nMax = 2400;
-let nStep = []; // animation speed
-let increasing = [];
-
 var Params = function() {
   this.curves = true;
   this.circles = false;
@@ -86,7 +77,14 @@ function getRndInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1) ) + min;
 }
 
-
+let pathMesh;
+let pathMeshes = [];
+let centerMeshes = [];
+let nEnd = [];
+let nMax = [];
+// let nMax = 2400;
+let nStep = []; // animation speed
+let increasing = [];
 let noOfPoint = 0;
 let coordinatesXYZ = [];
 let minLat = 90;
@@ -98,26 +96,39 @@ let mappedLon = [];
 let mappedLatLon = [];
 
 lbu.onData( ( data ) => {
-  // add points of each stream as array to coordinates
+
+  while(scene.children.length > 0){
+    scene.remove(scene.children[0]);
+  }
+
+  noOfPoint = 0;
+  coordinatesXYZ = [];
+  nEnd = [];
+  nMax = [];
+  nStep = []; // animation speed
+  increasing = [];
+  pathMeshes = [];
+  centerMeshes = [];
+
   // in data.last sind nur letzten (genauer) -> eventl. nicht verwenden
 
   // mapping of lat lon
-  for (let key of Object.keys(data.integrated)) {
-    let points = data.integrated[key];
-
-    for(let u = 0; u < points.length-1; u++) { // for all previous points for each streams
-      let lat = data.integrated[key][u];
-      let lon = data.integrated[key][u+1];
-
-      if (lat <= minLat) { minLat = lat; }
-      if (lat >= maxLat) { maxLat = lat; }
-
-      if (lon <= minLon) { minLon = lon; }
-      if (lon >= maxLon) { maxLon = lon; }
-      u++;
-    }
-  }
-
+  // for (let key of Object.keys(data.integrated)) {
+  //   let points = data.integrated[key];
+  //
+  //   for(let u = 0; u < points.length-1; u++) { // for all previous points for each streams
+  //     let lat = data.integrated[key][u];
+  //     let lon = data.integrated[key][u+1];
+  //
+  //     if (lat <= minLat) { minLat = lat; }
+  //     if (lat >= maxLat) { maxLat = lat; }
+  //
+  //     if (lon <= minLon) { minLon = lon; }
+  //     if (lon >= maxLon) { maxLon = lon; }
+  //     u++;
+  //   }
+  // }
+  //
   // let indexOfStream = 0;
   // for (let key of Object.keys(data.integrated)) {
   //   let points = data.integrated[key];
@@ -194,8 +205,6 @@ lbu.onData( ( data ) => {
         let y = rad * cosLat * sinLon;
         let z = rad * sinLat;
 
-        let xOffSet = 0;//dist(lat, 0);
-        let yOffSet = dist(lon, 0);
         // if(t == 0) { coordinatesOnStream.push( {x: 0, y: 0, z: 0} ); }
         coordinatesOnStream.push( {x: x, y: t, z: z} ); // change to {x: x, y: y, z: z} for globe view
       }
@@ -204,8 +213,6 @@ lbu.onData( ( data ) => {
     }
   }
   // END ORIGINAL DATA
-
-  // console.log( coordinatesXYZ );
 
 
   // LAST POINT AS SPHERES
@@ -255,8 +262,6 @@ lbu.onData( ( data ) => {
       indexSpehere++;
 
     }
-    //
-
   }
 
   // VISUALIZE TRAVELLED PATHS
@@ -333,7 +338,7 @@ lbu.onData( ( data ) => {
         scene.add( mesh );
       }
 
-      nStep.push(getRndInteger(1000, 20000)*0.001);
+      nStep.push(getRndInteger(1000, 20000)*0.0005);
       nEnd.push(0);
       nMax.push(2400);
       pathCounter++;
@@ -345,11 +350,9 @@ lbu.onData( ( data ) => {
     indexPaths++;
   }
 
-  // SPHERES FOR PREVIOUS POSITIONS
-
 
   // center connections
-  //
+
   // let centerIndex = 0;
   // for (let key of Object.keys(coordinatesXYZ)) {
   //
@@ -430,27 +433,27 @@ function loop(time) { // eslint-disable-line no-unused-vars
   requestAnimationFrame( loop );
   // console.log( nEnd );
 
-  for(let u=0; u < pathMeshes.length; u++){
+  lbu.onData( ( data ) => {
+    for(let u=0; u < pathMeshes.length; u++){
 
-    if(increasing[u]) {
-      nEnd[u] = ( nEnd[u] + nStep[u] );
-      if(nEnd[u] >= nMax[u]) {
-        increasing[u] = false;
-        // console.log("max reached");
-      }
+      if(increasing[u]) {
+        nEnd[u] = ( nEnd[u] + nStep[u] );
+        if(nEnd[u] >= nMax[u]) {
+          increasing[u] = false;
+          // console.log("max reached");
+        }
 
-    } else {
-      nEnd[u] = ( nEnd[u] - nStep[u] );
-      if(nEnd[u] <= nEnd[u]*0.1) {
-        increasing[u] = true;
-        // console.log("min reached");
+      } else {
+        nEnd[u] = ( nEnd[u] - nStep[u] );
+        if(nEnd[u] <= nEnd[u]*0.1) {
+          increasing[u] = true;
+          // console.log("min reached");
+        }
       }
+      pathMeshes[u].geometry.setDrawRange( 0, nEnd[u]+u*3+1 );
+      // console.log( nEnd[u]+u*3 );
     }
-    pathMeshes[u].geometry.setDrawRange( 0, nEnd[u]+u*3+1 );
-    // console.log( nEnd[u]+u*3 );
-
-
-  }
+  });
 
   renderer.render( scene, camera );
 }
