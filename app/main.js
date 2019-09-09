@@ -15,7 +15,7 @@ const H = 800;
 let renderer, scene, camera;
 let controls; // eslint-disable-line no-unused-vars
 
-let objectSize = 0.8;
+let objectSize = 0.5;
 let centerConnectionWidth = 2.11;
 let pathConnectionWidth = 9.5;
 
@@ -206,7 +206,7 @@ lbu.onData( ( data ) => {
         let z = rad * sinLat;
 
         // if(t == 0) { coordinatesOnStream.push( {x: 0, y: 0, z: 0} ); }
-        coordinatesOnStream.push( {x: x, y: t, z: z} ); // change to {x: x, y: y, z: z} for globe view
+        coordinatesOnStream.push( {x: x, y: y, z: z} ); // change to {x: x, y: y, z: z} for globe view
       }
       coordinatesXYZ.splice(noOfPoint, 0, coordinatesOnStream);
       noOfPoint++;
@@ -272,6 +272,7 @@ lbu.onData( ( data ) => {
     let streamPoints = coordinatesXYZ[key];
     let pathPoints = [];
     let pathCounter = 0;
+    let pointCounter = 2; // number of points on path
     if(streamPoints.length > 2) {
       for (let i = 0; i < streamPoints.length; i++) {
         let x = streamPoints[i].x;
@@ -280,13 +281,14 @@ lbu.onData( ( data ) => {
 
         pathPoints.push ( new THREE.Vector3(x,y,z) );
         i++;
+        pointCounter++;
       }
 
       // path
       var path = new THREE.CatmullRomCurve3( pathPoints );
 
       // params
-      var pathSegments = 50;
+      var pathSegments = 512;
       var tubeRadius = 0.1;
       var radiusSegments = 4;
       var closed = false;
@@ -296,7 +298,7 @@ lbu.onData( ( data ) => {
 
       // to buffer goemetry
       tubeGeometry = new THREE.BufferGeometry().fromGeometry( tubeGeometry );
-      // nMax = tubeGeometry.attributes.position.count;
+      let nMaxTemp = tubeGeometry.attributes.position.count;
       // console.log( tubeGeometry.attributes.position.count );
 
       var splineMat = new MeshLineMaterial( {
@@ -338,9 +340,10 @@ lbu.onData( ( data ) => {
         scene.add( mesh );
       }
 
-      nStep.push(getRndInteger(1000, 20000)*0.0005);
+      // nStep.push(getRndInteger(1, nMax)*0.1);
+      nStep.push(getRndInteger(1000, 2000)*0.05);
       nEnd.push(0);
-      nMax.push(2400);
+      nMax.push(24000);
       pathCounter++;
       pathMesh = new THREE.Mesh( tubeGeometry, splineMat );
       pathMeshes.push( pathMesh );
@@ -480,16 +483,16 @@ document.addEventListener('keydown', e => {
   }
 
   else if(e.key == '2') {
-    cameraX = 0;
-    cameraY = 60;
-    cameraZ = 0;
+    cameraX = 10;
+    cameraY = 5;
+    cameraZ = 40;
     viewMode = 2;
   }
 
   else if(e.key == '3') {
-    cameraX = 15;
-    cameraY = 12;
-    cameraZ = 20;
+    cameraX = 30;
+    cameraY = 20;
+    cameraZ = 60;
     viewMode = 3;
   }
 
