@@ -341,9 +341,9 @@ lbu.onData( ( data ) => {
       }
 
       // nStep.push(getRndInteger(1, nMax)*0.1);
-      nStep.push(getRndInteger(1000, 2000)*0.05);
+      nStep.push(getRndInteger(1000, 2000)*0.01);
       nEnd.push(0);
-      nMax.push(24000);
+      nMax.push(pathSegments*50);
       pathCounter++;
       pathMesh = new THREE.Mesh( tubeGeometry, splineMat );
       pathMeshes.push( pathMesh );
@@ -436,7 +436,7 @@ function loop(time) { // eslint-disable-line no-unused-vars
   requestAnimationFrame( loop );
   // console.log( nEnd );
 
-  lbu.onData( ( data ) => {
+  // lbu.onData( ( data ) => {
     for(let u=0; u < pathMeshes.length; u++){
 
       if(increasing[u]) {
@@ -456,9 +456,10 @@ function loop(time) { // eslint-disable-line no-unused-vars
       pathMeshes[u].geometry.setDrawRange( 0, nEnd[u]+u*3+1 );
       // console.log( nEnd[u]+u*3 );
     }
-  });
+  // });
 
   renderer.render( scene, camera );
+  // console.log(performance.memory)
 }
 
 
@@ -536,6 +537,13 @@ function initPageElements() {
 
 function dist(p0, p1) {
   return Math.sqrt( p0*p0 + p1*p1, 2);
+}
+
+function changeView(){
+  viewMode += 1;
+  if(viewMode > 3){
+    viewMode = 1;
+  }
 }
 
 function initUpload() {
