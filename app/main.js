@@ -43,6 +43,14 @@ var Params = function() {
 };
 var params = new Params();
 
+function changeView(){
+  console.log("clicked");
+  viewMode += 1;
+  if(viewMode > 3){
+    viewMode = 1;
+  }
+}
+
 (async function main() {
 
   await setup(); // set up scene
@@ -407,6 +415,8 @@ let cameraZ = 50;
 let viewMode = 1;
 function loop(time) { // eslint-disable-line no-unused-vars
 
+document.getElementById("clicker").addEventListener("click", changeView);
+
   //using timer as animation
   var speed = Date.now() * 0.00005;
   // camera.position.x = Math.cos(speed) * 40;
@@ -432,6 +442,24 @@ function loop(time) { // eslint-disable-line no-unused-vars
   // }
 
   camera.lookAt(scene.position);
+
+  if(viewMode == 1) {
+    cameraX = 20;
+    cameraY = 10;
+    cameraZ = 50;
+  }
+
+  if(viewMode == 2) {
+    cameraX = 10;
+    cameraY = 5;
+    cameraZ = 40;
+  }
+
+  if(viewMode == 3) {
+    cameraX = 30;
+    cameraY = 20;
+    cameraZ = 60;
+  }
 
   requestAnimationFrame( loop );
   // console.log( nEnd );
@@ -460,6 +488,9 @@ function loop(time) { // eslint-disable-line no-unused-vars
 
   renderer.render( scene, camera );
   // console.log(performance.memory)
+
+
+
 }
 
 
@@ -476,26 +507,26 @@ document.addEventListener('keydown', e => {
   //   util.toggleFullscreen();
   // }
 
-  if (e.key == '1') {
-    cameraX = 20;
-    cameraY = 10;
-    cameraZ = 50;
-    viewMode = 1;
-  }
-
-  else if(e.key == '2') {
-    cameraX = 10;
-    cameraY = 5;
-    cameraZ = 40;
-    viewMode = 2;
-  }
-
-  else if(e.key == '3') {
-    cameraX = 30;
-    cameraY = 20;
-    cameraZ = 60;
-    viewMode = 3;
-  }
+  // if (e.key == '1') {
+  //   cameraX = 20;
+  //   cameraY = 10;
+  //   cameraZ = 50;
+  //   viewMode = 1;
+  // }
+  //
+  // else if(e.key == '2') {
+  //   cameraX = 10;
+  //   cameraY = 5;
+  //   cameraZ = 40;
+  //   viewMode = 2;
+  // }
+  //
+  // else if(e.key == '3') {
+  //   cameraX = 30;
+  //   cameraY = 20;
+  //   cameraZ = 60;
+  //   viewMode = 3;
+  // }
 
   // else if (e.key == 'Dead') {
   //   util.saveCanvas();
@@ -537,13 +568,6 @@ function initPageElements() {
 
 function dist(p0, p1) {
   return Math.sqrt( p0*p0 + p1*p1, 2);
-}
-
-function changeView(){
-  viewMode += 1;
-  if(viewMode > 3){
-    viewMode = 1;
-  }
 }
 
 function initUpload() {
