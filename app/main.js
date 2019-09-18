@@ -691,9 +691,10 @@ function initUpload() {
       onLocation: loc => {
         log('LOCATION', loc);
       },
-    }).then(_res => {
+    }).then(res => {
       document.getElementById("keypad").style.display = "none";
       document.getElementById("afterupload").style.display = "block";
+      log('UPLOAD ID:', res.id); // <- TODO: Compare this to `data.last_updated_id` to determine if a data update was caused by this upload
       log('SUCCESS');
     }).catch(err => {
       // log('ERROR', err);
