@@ -9,12 +9,11 @@
   },
   "scripts": {
     "start": "browser-sync . --port 8080 --no-notify --files index.html app",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "reinstall": "npm ci",
     "bundle": "node parcel.js",
+    "build": "npm run bundle",
     "start-bundle": "browser-sync dist --port 8080 --no-notify",
-    "firebase-login": "firebase login",
-    "deploy": "npm run bundle && firebase deploy --only hosting"
+    "deploy": "firebase login && npm run bundle && firebase deploy --only hosting"
   },
   "keywords": [],
   "author": "Process <contact@process.studio> (https://process.studio)",
