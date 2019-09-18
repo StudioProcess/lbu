@@ -12,7 +12,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "reinstall": "npm ci",
     "bundle": "node parcel.js",
-    "start-bundle": "browser-sync dist --port 8080 --no-notify"
+    "start-bundle": "browser-sync dist --port 8080 --no-notify",
+    "firebase-login": "firebase login",
+    "deploy": "npm run bundle && firebase deploy --only hosting"
   },
   "keywords": [],
   "author": "Process <contact@process.studio> (https://process.studio)",
@@ -23,7 +25,10 @@
     "three": "^0.108.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.6.0",
+    "@babel/preset-env": "^7.6.0",
     "browser-sync": "^2.26.7",
+    "firebase-tools": "^7.3.2",
     "parcel-bundler": "^1.12.3"
   }
 }
