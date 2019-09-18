@@ -44,6 +44,10 @@ canvas {
 
 @media only screen and (min-width: 760px) {
 
+  .warning{
+    margin-top: 2em;
+  }
+
   .codeinputfield {
     display: flex;
     align-items: center;
