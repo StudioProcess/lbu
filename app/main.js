@@ -1,3 +1,4 @@
+import '../node_modules/regenerator-runtime/runtime.js'; // Needed for bundling (Handles transpiling of generators/async functions to ES5)
 import * as THREE from '../node_modules/three/build/three.module.js';
 import { OrbitControls } from '../node_modules/three/examples/jsm/controls/OrbitControls.js';
 import { MeshLine, MeshLineMaterial } from './THREE.MeshLine.module.js';

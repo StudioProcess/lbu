@@ -367,7 +367,7 @@ textarea::placeholder {
 
 #contribute {
   /* background-color: #ccf0fd; */
-  background-image: url('../assets/contribute_bg.png') !important; */
+  background-image: url('../assets/contribute_bg.png') !important;
   background-position: top;
   background-repeat: no-repeat;
   /* opacity: 0.5; */
