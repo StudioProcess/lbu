@@ -4,7 +4,7 @@ import { OrbitControls } from '../node_modules/three/examples/jsm/controls/Orbit
 import { MeshLine, MeshLineMaterial } from './THREE.MeshLine.module.js';
 import * as util from './util.js';
 import * as lbu from './lbu.js';
-// import * as data from '../data/random_on_land_000.json';
+import font from '../assets/fonts/Roboto_Regular.js';
 
 Number.prototype.map = function (in_min, in_max, out_min, out_max) {
   return (this - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
@@ -55,22 +55,16 @@ function changeView(){
   }
 }
 
-let loader = new THREE.FontLoader();
-let fontGeometry;
-
-loader.load( 'assets/fonts/Roboto_Regular.json', function ( font ) {
-
-  fontGeometry = new THREE.TextGeometry( 'You are here!', {
-    font: font,
-    size: 1,
-    height: 0,
-    curveSegments: 12,
-    bevelEnabled: false,
-    bevelThickness: 0,
-    bevelSize: 0,
-    bevelOffset: 0,
-    bevelSegments: 0
-  } );
+let fontGeometry = new THREE.TextGeometry( 'You are here!', {
+  font: new THREE.Font(font),
+  size: 1,
+  height: 0,
+  curveSegments: 12,
+  bevelEnabled: false,
+  bevelThickness: 0,
+  bevelSize: 0,
+  bevelOffset: 0,
+  bevelSegments: 0
 } );
 
 (async function main() {
