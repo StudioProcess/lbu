@@ -121,12 +121,12 @@ lbu.onData( ( data ) => {
   // in data.last sind nur letzten (genauer) -> eventl. nicht verwenden
 
   // mapping of lat lon
-  // for (let key of Object.keys(data.integrated)) {
-  //   let points = data.integrated[key];
+  // for (let key of Object.keys(data.paths)) {
+  //   let points = data.paths[key];
   //
   //   for(let u = 0; u < points.length-1; u++) { // for all previous points for each streams
-  //     let lat = data.integrated[key][u];
-  //     let lon = data.integrated[key][u+1];
+  //     let lat = data.paths[key][u];
+  //     let lon = data.paths[key][u+1];
   //
   //     if (lat <= minLat) { minLat = lat; }
   //     if (lat >= maxLat) { maxLat = lat; }
@@ -138,13 +138,13 @@ lbu.onData( ( data ) => {
   // }
   //
   // let indexOfStream = 0;
-  // for (let key of Object.keys(data.integrated)) {
-  //   let points = data.integrated[key];
+  // for (let key of Object.keys(data.paths)) {
+  //   let points = data.paths[key];
   //   let tempLatLon = [];
   //
   //   for(let t = 1; t < points.length-1; t++) {
-  //     let lat = data.integrated[key][t];
-  //     let lon = data.integrated[key][t+1];
+  //     let lat = data.paths[key][t];
+  //     let lon = data.paths[key][t+1];
   //     tempLatLon.push( lat );
   //     tempLatLon.push( lon );
   //   }
@@ -159,7 +159,7 @@ lbu.onData( ( data ) => {
 
   // BEGIN using mapped data
   // for (let i = 0; i < mappedLatLon.length-1; i++ ) {
-  //   // let points = data.integrated[key]; // array of points for individual stream
+  //   // let points = data.paths[key]; // array of points for individual stream
   //   let points = mappedLatLon[i];
   //   // console.log( points );
   //
@@ -190,8 +190,8 @@ lbu.onData( ( data ) => {
   // END MAPPED DATA
 
   // BEGIN using original data
-  for (let key of Object.keys(data.integrated) ) {
-    let points = data.integrated[key]; // array of points for individual stream
+  for (let key of Object.keys(data.paths) ) {
+    let points = data.paths[key]; // array of points for individual stream
     // let points = mappedLatLon[i];
     // console.log( points );
 
@@ -538,9 +538,9 @@ document.addEventListener('keydown', e => {
 function initLibrary() {
   // Initialize LBU Library
   const config = {
-    apiKey: "AIzaSyCdr0kpTbsED6du_p-RulO_m4L7aglFoio",
-    projectId: "letsbuildutopia-84770",
-    storageBucket: "letsbuildutopia-84770.appspot.com",
+    apiKey: "AIzaSyCIVzDiC_Gy8j9Qij7YQS8QyjDEYgNImRg",
+    projectId: "lets-build-utopia",
+    storageBucket: "lets-build-utopia.appspot.com",
   };
   lbu.init(config);
 }
