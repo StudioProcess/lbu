@@ -211,7 +211,6 @@ lbu.onData( ( data ) => {
   // END MAPPED DATA
 
   let lastUpdatedPath = data.last_updated_path;
-  console.log("NEW UPDATE ON: "+lastUpdatedPath);
   let noOfStream = 0;
   let lastUpdatedPathIndex;
 
@@ -251,7 +250,6 @@ lbu.onData( ( data ) => {
       noOfPoint++;
     }
     noOfStream++;
-    console.log("last up index"+lastUpdatedPathIndex);
   }
   // END ORIGINAL DATA
 
