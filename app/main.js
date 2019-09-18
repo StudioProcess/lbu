@@ -22,6 +22,7 @@ let pathConnectionWidth = 9.5;
 var resolution = new THREE.Vector2( window.innerWidth, window.innerHeight );
 
 let projectColors = [ '#ce3b43', '#2452c2', '#f2c200', '#b94db3', '#9bcfe4', '#b7b5a8', '#CCCCCC', '#CCDEFF' ];
+let lastPathColor = new THREE.Color ( 0xFF0000 );
 
 var Params = function() {
   this.curves = true;
@@ -43,6 +44,8 @@ var Params = function() {
 };
 var params = new Params();
 
+let uploaded = true;
+
 function changeView(){
   console.log("clicked");
   viewMode += 1;
@@ -50,6 +53,24 @@ function changeView(){
     viewMode = 1;
   }
 }
+
+let loader = new THREE.FontLoader();
+let fontGeometry;
+
+loader.load( 'assets/fonts/Roboto_Regular.json', function ( font ) {
+
+  fontGeometry = new THREE.TextGeometry( 'You are here!', {
+    font: font,
+    size: 1,
+    height: 0,
+    curveSegments: 12,
+    bevelEnabled: false,
+    bevelThickness: 0,
+    bevelSize: 0,
+    bevelOffset: 0,
+    bevelSegments: 0
+  } );
+} );
 
 (async function main() {
 
@@ -189,11 +210,20 @@ lbu.onData( ( data ) => {
   // }
   // END MAPPED DATA
 
+  let lastUpdatedPath = data.last_updated_path;
+  console.log("NEW UPDATE ON: "+lastUpdatedPath);
+  let noOfStream = 0;
+  let lastUpdatedPathIndex;
+
   // BEGIN using original data
   for (let key of Object.keys(data.paths) ) {
     let points = data.paths[key]; // array of points for individual stream
     // let points = mappedLatLon[i];
     // console.log( points );
+
+    if(key == lastUpdatedPath) {
+      lastUpdatedPathIndex = noOfStream;
+    }
 
 
     if(points.length > 0) {
@@ -216,9 +246,12 @@ lbu.onData( ( data ) => {
         // if(t == 0) { coordinatesOnStream.push( {x: 0, y: 0, z: 0} ); }
         coordinatesOnStream.push( {x: x, y: y, z: z} ); // change to {x: x, y: y, z: z} for globe view
       }
+      // console.log(key);
       coordinatesXYZ.splice(noOfPoint, 0, coordinatesOnStream);
       noOfPoint++;
     }
+    noOfStream++;
+    console.log("last up index"+lastUpdatedPathIndex);
   }
   // END ORIGINAL DATA
 
@@ -244,29 +277,58 @@ lbu.onData( ( data ) => {
 
       dotGeo = new THREE.SphereGeometry( objectSize/2, 5, 5 );
 
-      mat = new MeshLineMaterial( {
-        useMap: params.strokes,
-        color: new THREE.Color( projectColors[indexSpehere%projectColors.length] ),
-        opacity: params.strokes ? .5 : 1,
-        dashArray: params.dashArray,
-        dashOffset: params.dashOffset,
-        dashRatio: params.dashRatio,
-        resolution: resolution,
-        sizeAttenuation: params.sizeAttenuation,
-        lineWidth: centerConnectionWidth,
-        near: camera.near,
-        far: camera.far,
-        depthWrite: false,
-        depthTest: !params.strokes,
-        alphaTest: .5,//params.strokes ? .5 : 0,
-        transparent: true,
-        side: THREE.DoubleSide
-      });
+      if(indexSpehere == lastUpdatedPathIndex) { // last spehere
+        mat = new MeshLineMaterial( {
+          useMap: params.strokes,
+          color: lastPathColor,
+          opacity: params.strokes ? .5 : 1,
+          dashArray: params.dashArray,
+          dashOffset: params.dashOffset,
+          dashRatio: params.dashRatio,
+          resolution: resolution,
+          sizeAttenuation: params.sizeAttenuation,
+          lineWidth: centerConnectionWidth,
+          near: camera.near,
+          far: camera.far,
+          depthWrite: false,
+          depthTest: !params.strokes,
+          alphaTest: .5,//params.strokes ? .5 : 0,
+          transparent: true,
+          side: THREE.DoubleSide
+        });
+
+
+        let fontMesh = new THREE.Mesh( fontGeometry, mat );
+        fontMesh.position.set(x, y, z);
+        scene.add( fontMesh );
+
+
+
+      } else {
+        mat = new MeshLineMaterial( {
+          useMap: params.strokes,
+          color: new THREE.Color( projectColors[indexSpehere%projectColors.length] ),
+          opacity: params.strokes ? .5 : 1,
+          dashArray: params.dashArray,
+          dashOffset: params.dashOffset,
+          dashRatio: params.dashRatio,
+          resolution: resolution,
+          sizeAttenuation: params.sizeAttenuation,
+          lineWidth: centerConnectionWidth,
+          near: camera.near,
+          far: camera.far,
+          depthWrite: false,
+          depthTest: !params.strokes,
+          alphaTest: .5,//params.strokes ? .5 : 0,
+          transparent: true,
+          side: THREE.DoubleSide
+        });
+      }
 
       let mesh = new THREE.Mesh( dotGeo, mat );
       mesh.position.set(x, y, z);
       scene.add( mesh );
-
+      // console.log("XYZ KEY: "+key);
       indexSpehere++;
 
     }
@@ -308,14 +370,25 @@ lbu.onData( ( data ) => {
       tubeGeometry = new THREE.BufferGeometry().fromGeometry( tubeGeometry );
       let nMaxTemp = tubeGeometry.attributes.position.count;
       // console.log( tubeGeometry.attributes.position.count );
+      var splineMat;
+      if(indexPaths == lastUpdatedPathIndex) { // last path
+        splineMat = new MeshLineMaterial( {
+          color: lastPathColor,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 1.0
+          // wireframe: true
+        } );
+      } else {
 
-      var splineMat = new MeshLineMaterial( {
-        color: projectColors[indexPaths%projectColors.length],
-        side: THREE.DoubleSide,
-        transparent: true,
-        opacity: 1.0
-        // wireframe: true
-      } );
+        splineMat = new MeshLineMaterial( {
+          color: projectColors[indexPaths%projectColors.length],
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 1.0
+          // wireframe: true
+        } );
+      }
 
       // SPEHERES ON PREVIOUS POSITIONS
       let dotGeo = null;
@@ -323,24 +396,45 @@ lbu.onData( ( data ) => {
 
       dotGeo = new THREE.SphereGeometry( objectSize/4, 5, 5 );
 
-      mat = new MeshLineMaterial( {
-        useMap: params.strokes,
-        color: new THREE.Color( projectColors[indexPaths%projectColors.length] ),
-        opacity: params.strokes ? .5 : 1,
-        dashArray: params.dashArray,
-        dashOffset: params.dashOffset,
-        dashRatio: params.dashRatio,
-        resolution: resolution,
-        sizeAttenuation: params.sizeAttenuation,
-        lineWidth: centerConnectionWidth,
-        near: camera.near,
-        far: camera.far,
-        depthWrite: false,
-        depthTest: !params.strokes,
-        alphaTest: .5,//params.strokes ? .5 : 0,
-        transparent: true,
-        side: THREE.DoubleSide
-      });
+      if(indexPaths == lastUpdatedPathIndex) { // last path
+        mat = new MeshLineMaterial( {
+          useMap: params.strokes,
+          color: lastPathColor,
+          opacity: params.strokes ? .5 : 1,
+          dashArray: params.dashArray,
+          dashOffset: params.dashOffset,
+          dashRatio: params.dashRatio,
+          resolution: resolution,
+          sizeAttenuation: params.sizeAttenuation,
+          lineWidth: centerConnectionWidth,
+          near: camera.near,
+          far: camera.far,
+          depthWrite: false,
+          depthTest: !params.strokes,
+          alphaTest: .5,//params.strokes ? .5 : 0,
+          transparent: true,
+          side: THREE.DoubleSide
+        });
+      } else {
+        mat = new MeshLineMaterial( {
+          useMap: params.strokes,
+          color: new THREE.Color( projectColors[indexPaths%projectColors.length] ),
+          opacity: params.strokes ? .5 : 1,
+          dashArray: params.dashArray,
+          dashOffset: params.dashOffset,
+          dashRatio: params.dashRatio,
+          resolution: resolution,
+          sizeAttenuation: params.sizeAttenuation,
+          lineWidth: centerConnectionWidth,
+          near: camera.near,
+          far: camera.far,
+          depthWrite: false,
+          depthTest: !params.strokes,
+          alphaTest: .5,//params.strokes ? .5 : 0,
+          transparent: true,
+          side: THREE.DoubleSide
+        });
+      }
 
       for(let j = 0; j < pathPoints.length; j++) {
         let mesh = new THREE.Mesh( dotGeo, mat );
