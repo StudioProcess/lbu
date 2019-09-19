@@ -639,7 +639,9 @@ function initPageElements() {
   lbu.setupPopCounter({ selector: '#count_total', interval: 1000 });
 
   // live upload count
-  lbu.setupUploadCounter({ selector: '#count_connected' });
+  lbu.setupUploadCounter({ selector: '#count_connected' }).then(() => {
+    document.querySelector('.counter').style.display = 'block';
+  });
 
   // code entry
   lbu.setupCodeEntry({ code_input: '#code', digit_buttons: '#keypad button[data-digit]', delete_button: '#keypad button.delete' });
