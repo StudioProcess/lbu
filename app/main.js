@@ -122,7 +122,7 @@ let upload_id = ''; // set after successful upload
 lbu.onData( ( data ) => {
   // Did we initiate the current data update by uploading?
   const uploaded = data.last_updated_id && upload_id && upload_id == data.last_updated_id;
-  
+
   while(scene.children.length > 0){
     scene.remove(scene.children[0]);
   }
@@ -272,7 +272,7 @@ lbu.onData( ( data ) => {
 
       dotGeo = new THREE.SphereGeometry( objectSize/2, 5, 5 );
 
-      if(indexSpehere == lastUpdatedPathIndex) { // last spehere
+      if((indexSpehere == lastUpdatedPathIndex) && uploaded) { // last spehere
         mat = new MeshLineMaterial( {
           useMap: params.strokes,
           color: lastPathColor,
@@ -366,7 +366,7 @@ lbu.onData( ( data ) => {
       let nMaxTemp = tubeGeometry.attributes.position.count;
       // console.log( tubeGeometry.attributes.position.count );
       var splineMat;
-      if(indexPaths == lastUpdatedPathIndex) { // last path
+      if((indexPaths == lastUpdatedPathIndex) && uploaded) { // last path
         splineMat = new MeshLineMaterial( {
           color: lastPathColor,
           side: THREE.DoubleSide,
@@ -391,7 +391,7 @@ lbu.onData( ( data ) => {
 
       dotGeo = new THREE.SphereGeometry( objectSize/4, 5, 5 );
 
-      if(indexPaths == lastUpdatedPathIndex) { // last path
+      if((indexPaths == lastUpdatedPathIndex) && uploaded) { // last path
         mat = new MeshLineMaterial( {
           useMap: params.strokes,
           color: lastPathColor,
