@@ -502,9 +502,10 @@ let cameraX = 20;
 let cameraY = 10;
 let cameraZ = 50;
 let viewMode = 1;
+let first_frame = true;
 function loop(time) { // eslint-disable-line no-unused-vars
 
-document.getElementById("clicker").addEventListener("click", changeView);
+  document.getElementById("clicker").addEventListener("click", changeView);
 
   //using timer as animation
   var speed = Date.now() * 0.00005;
@@ -577,9 +578,11 @@ document.getElementById("clicker").addEventListener("click", changeView);
 
   renderer.render( scene, camera );
   // console.log(performance.memory)
-
-
-
+  
+  if (first_frame) { // show canvas after first frame is rendered
+    document.querySelector('canvas').classList.remove('hidden');
+    first_frame = false;
+  }
 }
 
 
@@ -640,7 +643,7 @@ function initPageElements() {
 
   // live upload count
   lbu.setupUploadCounter({ selector: '#count_connected' }).then(() => {
-    document.querySelector('.counter').style.display = 'block';
+    document.querySelector('.counter').classList.remove('hidden');
   });
 
   // code entry
