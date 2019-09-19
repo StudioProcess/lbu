@@ -45,8 +45,6 @@ var Params = function() {
 };
 var params = new Params();
 
-let uploaded = true;
-
 function changeView(){
   console.log("clicked");
   viewMode += 1;
@@ -119,8 +117,12 @@ let mappedLat = [];
 let mappedLon = [];
 let mappedLatLon = [];
 
-lbu.onData( ( data ) => {
+let upload_id = ''; // set after successful upload
 
+lbu.onData( ( data ) => {
+  // Did we initiate the current data update by uploading?
+  const uploaded = data.last_updated_id && upload_id && upload_id == data.last_updated_id;
+  
   while(scene.children.length > 0){
     scene.remove(scene.children[0]);
   }
@@ -694,7 +696,8 @@ function initUpload() {
     }).then(res => {
       document.getElementById("keypad").style.display = "none";
       document.getElementById("afterupload").style.display = "block";
-      log('UPLOAD ID:', res.id); // <- TODO: Compare this to `data.last_updated_id` to determine if a data update was caused by this upload
+      log('UPLOAD ID:', res.id); // <- Compare this to `data.last_updated_id` to determine if a data update was caused by this upload
+      upload_id = res.id; // remember this upload id in global variable
       log('SUCCESS');
     }).catch(err => {
       // log('ERROR', err);
