@@ -3,6 +3,7 @@ body {
   /* background-color: #ccf0fd; */
   /* background-color: #cce0e7; */
   /* background-color: #0e6eca; */
+  font-family: 'Roboto';
 }
 
 .outercanvas {
@@ -40,12 +41,86 @@ canvas {
   justify-content: center;
 }
 
+.text--line {
+  display: flex;
+  align-items: center;
+  font-size: 15em;
+}
 
+svg {
+  /* display: inline-block; */
+  /* width: 100%; */
+  /* min-width: 300px; */
+  width: 100%;
+  height: 100%;
+  max-height: 100px !important;
+  margin-bottom: 0;
+}
+
+.text-copy {
+  fill: none;
+  stroke: white;
+  stroke-dasharray: 20% 28%;
+  stroke-width: 9px;
+  -webkit-animation: stroke-offset 10s infinite linear;
+          animation: stroke-offset 10s infinite linear;
+}
+.text-copy:nth-child(1) {
+  stroke: #ce3b43;
+  stroke-dashoffset: 0%;
+}
+.text-copy:nth-child(2) {
+  stroke: #CCDEFF;
+  stroke-dashoffset: 40%;
+}
+.text-copy:nth-child(3) {
+  stroke: #f2c200;
+  stroke-dashoffset: 60%;
+}
+.text-copy:nth-child(4) {
+  stroke: #b94db3;
+  stroke-dashoffset: 80%;
+}
+.text-copy:nth-child(5) {
+  stroke: #2452c2;
+  stroke-dashoffset: 100%;
+}
+
+.numeranimation {
+  padding-bottom: 2em;
+}
+
+@-webkit-keyframes stroke-offset {
+  from {
+    stroke-dashoffset: 0%;
+  }
+  to {
+    stroke-dashoffset: 100% 100% 100% 100% 100%;
+  }
+}
+
+@keyframes stroke-offset {
+  from {
+    stroke-dashoffset: 0%;
+  }
+  to {
+    stroke-dashoffset: 100% 100% 100% 100% 100%;
+  }
+}
+
+.contribute-text {
+  padding-bottom: 2em;
+}
+
+.rounded-image {
+  border-radius: 25px;
+}
 
 @media only screen and (min-width: 760px) {
 
   .warning{
     margin-top: 2em;
+    font-size: 15px;
   }
 
   .codeinputfield {
@@ -55,8 +130,8 @@ canvas {
   }
 
   .icon {
-    background: #e6ebf7;
-    color: #2452c2;
+    background: #fff;
+    color: #000;
     margin: 3px;
     /* padding-left: 30px;
     padding-right: 30px; */
@@ -140,11 +215,12 @@ canvas {
   }
 
   .about {
-    color: #2452c2;
+    background-color: #ccc;
+    color: #3f3f3f;
   }
 
   .contribute {
-    color: #2452c2;
+    color: #3f3f3f;
   }
 
   .codeDeletionButton {
@@ -186,8 +262,10 @@ canvas {
     font-weight: bold;
     text-align: center;
     /* text-transform: uppercase; */
-    /* color: #2452c2; */
+    color: #3f3f3f;
     line-height: 1.1;
+    /* color: black; */
+
   }
 
   .titleresize-about {
@@ -215,9 +293,13 @@ canvas {
   }
 
   .numberresize {
-    font-size: 70px;
+    font-size: 120px;
     font-weight: bold;
     line-height: 1.1;
+    -webkit-text-fill-color: #1aaf7b; /* Will override color (regardless of order) */
+    -webkit-text-stroke-width: 3px;
+    -webkit-text-stroke-color: #ffffff;
+    text-align: center;
   }
 
   .textresize {
@@ -250,7 +332,7 @@ canvas {
   .uploadbutton {
     padding: 2em 6em 2em 6em;
     background-color: #fff !important;
-    color: #2452c2 !important;
+    color: #000 !important;
     font-size: 30px;
     font-weight: bold;
     cursor: pointer;
@@ -266,7 +348,7 @@ canvas {
 
   .uploadbutton:hover {
     padding: 2em 6em 2em 6em;
-    background-color: #2452c2 !important;
+    background-color: #ccc !important;
     color: #fff !important;
     font-size: 30px;
     font-weight: bold;
@@ -297,18 +379,18 @@ canvas {
 
   .finaluploadbutton {
     margin-top: 1em !important;
-    background-color: #e6ebf7 !important;
+    background-color: #ffffff !important;
     font-size: 30px !important;
     font-weight: bold !important;
     cursor: pointer;
-    color: #2452c2 !important;
+    color: #1aaf7b !important;
   }
 
   .finaluploadbutton:hover {
-    background-color: #2452c2 !important;
+    background-color: #1aaf7b !important;
     font-size: 30px !important;
     font-weight: bold !important;
-    color: #fff !important;
+    color: #ffffff !important;
     cursor: pointer;
   }
 
@@ -329,7 +411,7 @@ canvas {
 
   .image-upload {
     text-align: center;
-    min-height: 500px !important;
+    min-height: 800px !important;
     border: none;
     font-size: 17px;
     /* padding: 2em; */
@@ -341,7 +423,7 @@ canvas {
     justify-content: center;
     display: flex;
     cursor: pointer;
-    background-image: url('../assets/photos/placeholder_photo.png') !important;
+    background-image: url('../assets/photos/placeholder_photo_circle.png') !important;
     background-position: center;
     background-repeat: no-repeat;
   }
@@ -363,6 +445,7 @@ canvas {
     /* font-size: 17px; */
     color: #000000 !important;
     /* outline-offset: 0.9em; */
+    border-radius: 10px;
   }
 
   .messageField:hover {
@@ -402,7 +485,7 @@ canvas {
     /* background-position: top;
     background-repeat: no-repeat; */
     /* opacity: 0.5; */
-    background-color: #f3f3f3;
+    background-color: #cccccc;
   }
 
   .messageupload {
