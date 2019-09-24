@@ -321,7 +321,7 @@ hr.new {
     text-align: center;
     font-size: 25px;
     font-weight: bold;
-    line-height: 0;
+    line-height: 1.0;
   }
 
   .numberresize {
