@@ -3,7 +3,7 @@ body {
   /* background-color: #ccf0fd; */
   /* background-color: #cce0e7; */
   /* background-color: #0e6eca; */
-  font-family: 'Roboto';
+  font-family: 'Montserrat', sans-serif !important;
 }
 
 .outercanvas {
@@ -14,7 +14,7 @@ body {
 }
 
 canvas {
-  position: relative;
+  position: fixed;
   right: 50%;
   left: 50%;
   height: 100vh !important;
@@ -26,6 +26,7 @@ canvas {
   background-size: cover;
   pointer-events: none;
   background-color: none !important;
+  z-index: -1;
 }
 
 #count_connected {
@@ -66,7 +67,7 @@ svg {
           animation: stroke-offset 10s infinite linear;
 }
 .text-copy:nth-child(1) {
-  stroke: #ce3b43;
+  stroke: #2452c2;
   stroke-dashoffset: 0%;
 }
 .text-copy:nth-child(2) {
@@ -82,7 +83,7 @@ svg {
   stroke-dashoffset: 80%;
 }
 .text-copy:nth-child(5) {
-  stroke: #2452c2;
+  stroke: #ce3b43;
   stroke-dashoffset: 100%;
 }
 
@@ -109,6 +110,7 @@ svg {
 }
 
 .contribute-text {
+  padding-top: 4em;
   padding-bottom: 2em;
 }
 
@@ -116,9 +118,22 @@ svg {
   border-radius: 25px;
 }
 
+hr.new {
+  border: 1px solid #2452c2;
+  border-radius: 2px;
+}
+
 @media only screen and (min-width: 760px) {
 
+  .titleresize-found-one {
+    text-align: center;
+    font-weight: bold;
+    font-size: 75px;
+    line-height: 0.7;
+  }
+
   .warning{
+    color: #7e7e7e;
     margin-top: 2em;
     font-size: 15px;
   }
@@ -129,9 +144,15 @@ svg {
     justify-content: center;
   }
 
+  .codefield {
+    color: #2452c2;
+    border-radius: 10px;
+    border: #2452c2 1px solid !important;
+  }
+
   .icon {
     background: #fff;
-    color: #000;
+    color: #2452c2;
     margin: 3px;
     /* padding-left: 30px;
     padding-right: 30px; */
@@ -167,10 +188,6 @@ svg {
     margin-right: 0.3em;
     font-family: "Ionicons", "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
     letter-spacing: 3px;
-  }
-
-  .codeinputfield {
-
   }
 
   #uploadBar {
@@ -215,12 +232,13 @@ svg {
   }
 
   .about {
-    background-color: #ccc;
-    color: #3f3f3f;
+    background-image: linear-gradient(rgba(244, 244, 244, 0.97) , rgba(244, 244, 244, 0.8));
+    color: #2452c2;
+    z-index: 1;
   }
 
   .contribute {
-    color: #3f3f3f;
+    color: #2452c2;
   }
 
   .codeDeletionButton {
@@ -262,7 +280,7 @@ svg {
     font-weight: bold;
     text-align: center;
     /* text-transform: uppercase; */
-    color: #3f3f3f;
+    color: #2452c2;
     line-height: 1.1;
     /* color: black; */
 
@@ -292,6 +310,20 @@ svg {
     line-height: 1.4;
   }
 
+  .subtitleresize-center-code {
+    text-align: center;
+    font-size: 25px;
+    font-weight: bold;
+    line-height: 0.0;
+  }
+
+  .subtitleresize-center-textfield {
+    text-align: center;
+    font-size: 25px;
+    font-weight: bold;
+    line-height: 0;
+  }
+
   .numberresize {
     font-size: 120px;
     font-weight: bold;
@@ -317,7 +349,7 @@ svg {
 
   .credits {
     color: #2452c2;
-    background-color: #f4f4f4;
+    background-color: rgba(244, 244, 244, 0.8);
     padding-top: 2em;
     padding-bottom: 2em;
     text-align: center;
@@ -330,26 +362,28 @@ svg {
   }
 
   .uploadbutton {
-    padding: 2em 6em 2em 6em;
+    padding: 1em 3em 1em 3em;
     background-color: #fff !important;
-    color: #000 !important;
+    color: #2452c2 !important;
     font-size: 30px;
     font-weight: bold;
     cursor: pointer;
+    border-radius: 10px;
+    border: #2452c2 1px solid !important;
     /* border: 4px solid #ff6666; */
   }
 
   ::selection {
-    background: #ffdbdd; /* WebKit/Blink Browsers */
+    background: #ffffff; /* WebKit/Blink Browsers */
   }
   ::-moz-selection {
-    background: #ffdbdd; /* Gecko Browsers */
+    background: #ffffff; /* Gecko Browsers */
   }
 
   .uploadbutton:hover {
-    padding: 2em 6em 2em 6em;
-    background-color: #ccc !important;
-    color: #fff !important;
+    padding: 1em 3em 1em 3em;
+    background-color: #fff !important;
+    color: #ff6666 !important;
     font-size: 30px;
     font-weight: bold;
     cursor: pointer;
@@ -383,11 +417,13 @@ svg {
     font-size: 30px !important;
     font-weight: bold !important;
     cursor: pointer;
-    color: #1aaf7b !important;
+    color: #2452c2 !important;
+    border-radius: 10px;
+    border: #2452c2 1px solid !important;
   }
 
   .finaluploadbutton:hover {
-    background-color: #1aaf7b !important;
+    background-color: #2452c2 !important;
     font-size: 30px !important;
     font-weight: bold !important;
     color: #ffffff !important;
@@ -435,15 +471,14 @@ svg {
 
   .messageField {
     margin-top: 2em;
-    border: none !important;
+    border: #2452c2 1px solid !important;
     font-size: 17px;
     /* padding: 2em; */
-    color: #000 !important;
     background-color: #FFF;
     /* outline: 2px solid #2452c2 !important; */
     min-height: 100px;
     /* font-size: 17px; */
-    color: #000000 !important;
+    color: #2452c2 !important;
     /* outline-offset: 0.9em; */
     border-radius: 10px;
   }
@@ -460,24 +495,60 @@ svg {
   }
 
    textarea::-webkit-input-placeholder {
-    color: #525252;
+    color: #2452c2;
   }
 
   textarea:-moz-placeholder {
-    color: #525252;
+    color: #2452c2;
   }
 
   textarea::-moz-placeholder {
-    color: #525252;
+    color: #2452c2;
   }
 
   textarea:-ms-input-placeholder {
-    color: #525252;
+    color: #2452c2;
   }
 
   textarea::placeholder {
-    color: #525252;
+    color: #2452c2;
   }
+
+
+
+
+
+
+
+  input::-webkit-input-placeholder {
+   color: #2452c2;
+   font-size: 20px;
+   letter-spacing: normal;
+ }
+
+ input:-moz-placeholder {
+   color: #2452c2;
+   font-size: 20px;
+   letter-spacing: normal;
+ }
+
+ input::-moz-placeholder {
+   color: #2452c2;
+   font-size: 20px;
+   letter-spacing: normal;
+ }
+
+ input:-ms-input-placeholder {
+   color: #2452c2;
+   font-size: 20px;
+   letter-spacing: normal;
+ }
+
+ input::placeholder {
+   color: #2452c2;
+   font-size: 20px;
+   letter-spacing: normal;
+ }
 
   #contribute {
     /* background-color: #ccf0fd; */
@@ -485,7 +556,13 @@ svg {
     /* background-position: top;
     background-repeat: no-repeat; */
     /* opacity: 0.5; */
-    background-color: #cccccc;
+    /* background-color: #ccc 0.6; */
+    /* background-color: rgba(244, 244, 244, 0.8); */
+    border-top-color: #2452c2;
+    border-top-width: 1px;
+    border-top-style: solid;
+    background-image: linear-gradient(rgba(244, 244, 244, 0.8) , rgba(244, 244, 244, 0.97));
+    z-index: 2;
   }
 
   .messageupload {
@@ -501,23 +578,22 @@ svg {
     top: 1em;
     left: 1em;
     position: fixed;
-    font-family: sans-serif;
     font-size: 20px;
-    z-index: 1;
+    z-index: 3;
     max-width: 250px;
   }
 
   .logonew {
     top: 35px;
     position: fixed;
-    z-index: 1;
+    z-index: 4;
   }
 
   .lbu {
     top: 35px !important;
     right: 2em !important;
     position: fixed !important;
-    z-index: 1;
+    z-index: 5;
 
     padding: .25em !important ;
     padding-left: .25em !important;
@@ -560,7 +636,6 @@ canvas { transition: opacity 2s; opacity:1; transition-delay: 0.5s; }
     top: 35px;
     left: 15px;
     position: fixed;
-    font-family: sans-serif;
     font-size: 20px;
     z-index: 1;
   }

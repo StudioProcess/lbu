@@ -23,6 +23,7 @@ let pathConnectionWidth = 9.5;
 var resolution = new THREE.Vector2( window.innerWidth, window.innerHeight );
 
 let projectColors = [ '#ce3b43', '#2452c2', '#f2c200', '#b94db3', '#9bcfe4', '#b7b5a8', '#CCCCCC', '#CCDEFF' ];
+// let projectColors = [ '#ff7978', '#2452c2', '#f2c200', '#ff83db', '#3b9fff', '#b7b5a8', '#CCCCCC', '#d4ff4d' ];
 let lastPathColor = new THREE.Color ( 0xFF0000 );
 
 var Params = function() {
@@ -578,7 +579,7 @@ function loop(time) { // eslint-disable-line no-unused-vars
 
   renderer.render( scene, camera );
   // console.log(performance.memory)
-  
+
   if (first_frame) { // show canvas after first frame is rendered
     document.querySelector('canvas').classList.remove('hidden');
     first_frame = false;
