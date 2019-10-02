@@ -46,6 +46,8 @@ var Params = function() {
 };
 var params = new Params();
 
+let fontMesh;
+
 function changeView(){
   console.log("clicked");
   viewMode += 1;
@@ -294,7 +296,7 @@ lbu.onData( ( data ) => {
         });
 
 
-        let fontMesh = new THREE.Mesh( fontGeometry, mat );
+        fontMesh = new THREE.Mesh( fontGeometry, mat );
         fontMesh.position.set(x, y, z);
         scene.add( fontMesh );
 

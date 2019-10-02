@@ -146,7 +146,7 @@ hr.new {
 
   .codefield {
     color: #2452c2;
-    border-radius: 10px;
+    /* border-radius: 10px; */
     border: #2452c2 1px solid !important;
   }
 
@@ -368,7 +368,7 @@ hr.new {
     font-size: 30px;
     font-weight: bold;
     cursor: pointer;
-    border-radius: 10px;
+    /* border-radius: 10px; */
     border: #2452c2 1px solid !important;
     /* border: 4px solid #ff6666; */
   }
@@ -418,7 +418,7 @@ hr.new {
     font-weight: bold !important;
     cursor: pointer;
     color: #2452c2 !important;
-    border-radius: 10px;
+    /* border-radius: 10px; */
     border: #2452c2 1px solid !important;
   }
 
@@ -459,7 +459,7 @@ hr.new {
     justify-content: center;
     display: flex;
     cursor: pointer;
-    background-image: url('../assets/photos/placeholder_photo_circle.png') !important;
+    background-image: url('../assets/photos/placeholder_photo_circle_red.png') !important;
     background-position: center;
     background-repeat: no-repeat;
   }
@@ -480,7 +480,7 @@ hr.new {
     /* font-size: 17px; */
     color: #2452c2 !important;
     /* outline-offset: 0.9em; */
-    border-radius: 10px;
+    /* border-radius: 10px; */
   }
 
   .messageField:hover {
