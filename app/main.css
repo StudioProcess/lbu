@@ -62,6 +62,10 @@ svg {
   color: #2452c2;
 }
 
+.instagram {
+  padding-top: 3em;
+}
+
 #contribute {
   /* background-color: #ccf0fd; */
   /* background-image: url('../assets/contribute_bg.png') !important;
@@ -352,6 +356,12 @@ hr.new {
     font-size: 20px;
     font-weight: normal;
     line-height: 1.4;
+  }
+
+  .textresize-center a {
+    color: #2452c2 !important;
+    font-weight: bold !important;
+    text-decoration: underline !important;
   }
 
   .textresize-center {
@@ -1107,6 +1117,12 @@ http://stackoverflow.com/a/34696029/383904
     font-size: 18px;
     font-weight: normal;
     line-height: 1.4;
+  }
+
+  .textresize-center a {
+    color: #2452c2 !important;
+    font-weight: bold !important;
+    text-decoration: underline !important;
   }
 
   .credits {
