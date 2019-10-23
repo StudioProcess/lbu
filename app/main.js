@@ -301,7 +301,6 @@ lbu.onData( ( data ) => {
         scene.add( fontMesh );
 
 
-
       } else {
         mat = new MeshLineMaterial( {
           useMap: params.strokes,
@@ -702,8 +701,17 @@ function initUpload() {
         log('LOCATION', loc);
       },
     }).then(res => {
+      // get upload Counter
+      let currentUploadCounter = parseInt(  document.querySelector('#count_connected').textContent) ;
+      document.querySelector('#current_upload_counter').textContent = currentUploadCounter+1;
+
       document.getElementById("keypad").style.display = "none";
       document.getElementById("afterupload").style.display = "block";
+      document.getElementById("contribute").scrollIntoView();
+
+      console.log( parseInt( currentUploadCounter ) );
+      console.log( currentUploadCounter );
+
       log('UPLOAD ID:', res.id); // <- Compare this to `data.last_updated_id` to determine if a data update was caused by this upload
       upload_id = res.id; // remember this upload id in global variable
       log('SUCCESS');
