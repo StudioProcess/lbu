@@ -29,6 +29,10 @@ canvas {
   z-index: -1;
 }
 
+#upload_count_success {
+  display: none;
+}
+
 #count_connected {
   font-size: 25px;
 }

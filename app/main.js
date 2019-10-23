@@ -701,13 +701,19 @@ function initUpload() {
         log('LOCATION', loc);
       },
     }).then(res => {
+
+
       // get upload Counter
-      let currentUploadCounter = parseInt(  document.querySelector('#count_connected').textContent) ;
-      document.querySelector('#current_upload_counter').textContent = currentUploadCounter+1;
+      let currentUploadCounter = parseInt(  document.querySelector('#count_connected').textContent.replace(/\./g,'') ) ;
+      if(!isNaN(currentUploadCounter)) {
+        document.querySelector('#upload_count_success').style.display = "block";
+      }
+
+      document.getElementById("contribute").scrollIntoView();
+      document.querySelector('#current_upload_counter').textContent = Number(currentUploadCounter+1).toLocaleString("de");
 
       document.getElementById("keypad").style.display = "none";
       document.getElementById("afterupload").style.display = "block";
-      document.getElementById("contribute").scrollIntoView();
 
       console.log( parseInt( currentUploadCounter ) );
       console.log( currentUploadCounter );
