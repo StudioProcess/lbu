@@ -1,6 +1,6 @@
 /*
   Exported functions:
-
+  
   For use in production:
     init(config)
     setupCodeEntry(opts)
@@ -9,7 +9,7 @@
     setupImageSelect(opts): Promise
     onData(cb): Promise
     upload(opts): Promise
-
+  
   Sample data:
     loadSampleData(): Promise
     sampleLocation(previousPoint, distance): Promise
@@ -18,7 +18,7 @@
     sampleUpload(opts): Promise
     samplePathData(opts): Promise
     samplePathDataMultiple(opts): Promise
-
+  
   Reset functions:
     resetPaths(): Promise
     resetUploads(): Promise
@@ -58,49 +58,50 @@ export function setupCodeEntry(opts) {
     digit_buttons: '#keypad button[data-digit]',
     delete_button: '#keypad button.delete'
   };
-
+  
   opts = Object.assign({}, defaults, opts);
-
+  
   function characterForDigit(d) {
     let cp = digits[d][1];
     return String.fromCodePoint(cp);
   }
-
+  
   const input = document.querySelector(opts.code_input);
   const digitButtons = document.querySelectorAll(opts.digit_buttons);
   const deleteButton = document.querySelector(opts.delete_button);
-
+  
   digitButtons.forEach(el => {
     el.addEventListener('mousedown', _e => {
       input.value += characterForDigit(el.dataset.digit);
     });
   });
-
+  
   deleteButton.addEventListener('mousedown', _e => {
     input.value = input.value.slice(0, -1);
   });
 }
 
 // Pop Counter
+// Updates textContent of selector with a number using thousands seperators e.g.: 1.234.567
 export function setupPopCounter(opts) {
   const defaults = {
     selector: '#populationClock',
     interval: 1000,
   };
   opts = Object.assign({}, defaults, opts);
-
+  
   const start = 7714100000;
   const persecond = 2.62;
   const date = new Date('2019-07-05');
   const interval = opts.interval;
   const el = document.querySelector(opts.selector)
-
+  
   function update() {
     let diff = Math.round( (new Date() - date)/1000 ) + 1;
     let result = Math.round( diff * persecond + start );
     el.textContent = Number(result).toLocaleString('de');
   }
-
+  
   setInterval(update, interval);
   update();
 }
@@ -108,22 +109,23 @@ export function setupPopCounter(opts) {
 
 // Live Upload Counter
 // Returns: Promise, resolves when first count is received
+// Updates textContent of selector with a number using thousands seperators e.g.: 1.234
 export function setupUploadCounter(opts) {
   const defaults = {
     selector: '#uploadCount'
   }
   opts = Object.assign({}, defaults, opts);
-
+  
   return new Promise((resolve, _reject) => {
-
+    
     db.doc('stats/stats').onSnapshot(snap => {
       let count = snap.data().uploadCount;
       if (count !== undefined) {
-        document.querySelector(opts.selector).textContent = count;
+        document.querySelector(opts.selector).textContent = Number(count).toLocaleString('de');
         resolve(count);
       }
     });
-
+    
   });
 }
 
@@ -138,7 +140,7 @@ export async function setupImageSelect(opts, cb) {
   }
   opts = Object.assign({}, defaults, opts);
   let input = document.querySelector(opts.input);
-
+  
   return new Promise(resolve => {
     input.addEventListener('change', e => {
       let file = e.target.files[0];
@@ -175,7 +177,7 @@ export async function setupImageSelect(opts, cb) {
 //   last_updated_path: "001"
 //   last_updated_id: "NPQ5FIvh2KWnwHvkDUcJ"
 // }
-// NOTES:
+// NOTES: 
 //   "paths": last lat/lng entries are newest. oldest are dropped when a maximum length is exceeded
 //   "last_updated_path": key of last updated path
 //   "last_updated_id": id of the upload that caused the last update. is also returned by the upload() function in the 'id' property of its resolving object
@@ -250,21 +252,21 @@ function getFileMetadata(file) {
 }
 
 // Handle Upload
-//
-// file:       File (https://developer.mozilla.org/en-US/docs/Web/API/File)
-// code:       String eg. '0_0_0_0_0_0', or Ionicon symbols
+// 
+// file:       File (https://developer.mozilla.org/en-US/docs/Web/API/File) 
+// code:       String eg. '0_0_0_0_0_0', or Ionicon symbols 
 // message:    String (optional)
 // onProgress: callback function, called with { bytesTransferred, totalBytes }
 // onLocation: callback function, called with { latitude, longitude, accuracy, timestamp }
 // locationOptions:  https://developer.mozilla.org/en-US/docs/Web/API/PositionOptions
 // locationOverride: {latitude, longitude, accuracy, timestamp}
-// Returns:    Promise, resolves with {id, docRef, storageRef, uploadTaskSnap}.
+// Returns:    Promise, resolves with {id, docRef, storageRef, uploadTaskSnap}. 
 // Note:       An 'id' is also returned by onData() in its 'last_updated_id' property and can be used to dermine if the upload caused a data update
 // Errors:
 //   { name:'MissingFile',            message:'No file provided' }
 //   { name:'InvalidFileParameter',   message:'Invalid file parameter' }
 //   { name:'InvalidFileType',        message:'Invalid file type. Please select PNG, JPEG or WEBP' }
-//   { name:'InvalidFileSize',        message:'File size exceeds upload limit' }
+//   { name:'InvalidFileSize',        message:'File size exeeds upload limit' }
 //   { name:'MissingCode',            message:'No upload code provided' }
 //   { name:'InvalidCodeFormat',      message:'Invalid code format' }
 //   { name:'GeolocationUnsupported', message:'Geolocation feature unsupported in browser' }
@@ -272,7 +274,7 @@ function getFileMetadata(file) {
 //   { name:'GeolocationUnavailable', message:'Geolocation (temporarily) unavailable' }
 //   { name:'GeolocationTimeout',     message:'Geolocation timeout' }
 //   { name:'InvalidCode',            message:'Invalid upload code provided' }
-//   { name:'UploadSize',             message:'Upload size limit exceeded' }
+//   { name:'UploadSize',             message:'Upload size limit exeeded' }
 //   { name:'UploadError',            message:'Error while uploading file', errorObject }
 const FILE_SIZE_LIMIT = 1024 * 1024 * 10;
 export async function upload(opts) {
@@ -286,12 +288,12 @@ export async function upload(opts) {
     locationOverride: undefined,
   };
   opts = Object.assign({}, defaults, opts);
-
+  
   // Check geolocation browser support
   if (!geolocationSupported()) {
     throw { name:'GeolocationUnsupported', message:'Geolocation feature unsupported in browser' }
   }
-
+  
   // Check file
   if ( !opts.file ) {
     throw { name:'MissingFile', message:'No file provided' }
@@ -303,9 +305,9 @@ export async function upload(opts) {
     throw { name:'InvalidFileType', message:'Invalid file type. Please select PNG, JPEG or WEBP' };
   }
   if (opts.file.size > FILE_SIZE_LIMIT * 0.99) {
-    throw { name:'InvalidFileSize', message:'File size exceeds upload limit' };
+    throw { name:'InvalidFileSize', message:'File size exeeds upload limit' };
   }
-
+  
   // Check code
   if ( opts.code == '' ) {
     throw { name:'MissingCode', message:'No upload code provided' };
@@ -316,7 +318,7 @@ export async function upload(opts) {
   if ( !checkCodeFormat(opts.code) ) {
     throw { name:'InvalidCodeFormat', message:'Invalid code format' };
   }
-
+  
   // Request Location
   let loc = opts.locationOverride;
   if (!loc) {
@@ -335,7 +337,7 @@ export async function upload(opts) {
   if (opts.onLocation instanceof Function) {
     opts.onLocation(loc);
   }
-
+  
   // Upload Data
   let request = {
     message: opts.message,
@@ -356,7 +358,7 @@ export async function upload(opts) {
     }
     throw e;
   }
-
+  
   // Upload File
   const storageRef = storage.ref(`${docRef.id}/${request.photoMetadata.name}`);
   let uploadTaskSnap;
@@ -372,10 +374,10 @@ export async function upload(opts) {
     }
     uploadTaskSnap = await uploadTask;
   } catch (e) {
-    if (e.code_ == 'storage/unauthorized') throw { name:'UploadSize', message:'Upload size limit exceeded' };
+    if (e.code_ == 'storage/unauthorized') throw { name:'UploadSize', message:'Upload size limit exeeded' };
     else throw { name:'UploadError', message:'Error while uploading file', errorObject:e };
   }
-
+  
   return {
     id: docRef.id, // upload id, used to check if incoming paths data was caused by this upload
     docRef,
@@ -398,12 +400,12 @@ function getGridCell(lat, lng) {
   lat += 1; // seems data is indexed like this
   if (lat < -90 || lat > 90) return [];
   lat = Math.floor(lat);
-
+  
   while (lng < -180) lng += 360;
   while (lng > 180) lng -= 360;
   lng = Math.floor(lng);
-
-  const key = 'lat' + (lat<0 ? '-' : '+') + String(Math.abs(lat)).padStart(3, '0')
+  
+  const key = 'lat' + (lat<0 ? '-' : '+') + String(Math.abs(lat)).padStart(3, '0') 
     + '_lng' + (lng<0 ? '-' : '+') + String(Math.abs(lng)).padStart(3, '0');
 
   const grid = _sampleData[key];
@@ -468,7 +470,7 @@ export async function checkSampleData() {
 export async function sampleLocation(previousPoint, distance = 100) {
   await loadSampleData(); // make sure sample data is loaded
   if (!_sampleData) return; // return undefined if we have no data
-
+  
   if (!previousPoint) {     // get a random point (ignore distance)
     let data;
     while (!data || data.length < 2000) { // find a full grid cell
@@ -479,7 +481,7 @@ export async function sampleLocation(previousPoint, distance = 100) {
     // console.log('picking index', idx)
     return data.slice( idx, idx+2 );
   }
-
+  
   // let data = getGridCell(previousPoint[0], previousPoint[1]);
   const data = getGridCellNeighborhood(previousPoint[0], previousPoint[1], distance / KM_PER_DEG);
   if (data.length == 0) {
@@ -524,7 +526,7 @@ export async function samplePic(width = 1500, height = 1000) {
       ctx.fill();
     }
   }
-
+  
   let blob = await new Promise( resolve => canvas.toBlob(resolve) );
   let timestamp = new Date();
   let name = 'randompic_' + timestamp.toISOString() + '.png';
@@ -543,7 +545,7 @@ export async function uploadCode(dotNum) {
     if (!response.ok) throw { message: 'Request failed', responseObject: response };
     const codes = await response.json();
     if (dotNum < 0 || dotNum > codes.length-1) return;
-    return codes[dotNum];
+    return codes[dotNum]; 
   } catch (err) {
     console.log('Couldn\'t load upload codes');
     return;
@@ -563,25 +565,25 @@ export async function sampleUpload(opts) {
     longitude: undefined,
   };
   opts = Object.assign({}, defaults, opts);
-
+  
   if ( opts.dotNum === undefined || isNaN(opts.dotNum) ) {
     opts.dotNum = Math.floor( 1 + Math.random() * 320 );
   }
-
+  
   if ( opts.distance === undefined || isNaN(opts.distance) ) {
     opts.distance = defaults.distance;
   }
-
+  
   const message = "Hello, sample message " + (new Date()).toISOString() + "!";
   const code = await uploadCode(opts.dotNum);
   const codeSymbols = code.split('_').reduce( (acc, num) => acc + String.fromCodePoint(digits[parseInt(num)][1]), '' );
   const photo = await samplePic();
-
+  
   // Determine location
   const loc = { latitude: 0, longitude: 0, accuracy: 0, timestamp: new Date() };
   const snap = await db.doc('paths/paths').get();
   const paths = snap.data().paths;
-  const dotData = paths[ String(opts.dotNum).padStart(3,'0') ];
+  const dotData = paths[ String(opts.dotNum).padStart(3,'0') ]; 
   const previousLoc = dotData ? dotData.slice(-2) : null;
   let distance;
   if (opts.latitude !== undefined && opts.longitude !== undefined) { // use given location
@@ -602,7 +604,7 @@ export async function sampleUpload(opts) {
     code,
     message,
     locationOverride: loc,
-
+    
     codeSymbols,
     dotNum: opts.dotNum,
     distance,
@@ -625,10 +627,10 @@ async function addSamplePath(data, opts) {
     steps: 1, // how many points to add
   };
   opts = Object.assign({}, defaults, opts);
-
+  
   data = Object.assign({}, data); // clone data object
-
-  // parameter checks and sanitizing
+  
+  // parameter checks and sanitizing 
   if (opts.steps <= 0) return data;
   if (opts.steps == undefined) { opts.steps = defaults.steps; }
   if (opts.distanceMin == undefined || opts.distanceMin <= 0) { opts.distanceMin = defaults.distanceMin; }
@@ -638,7 +640,7 @@ async function addSamplePath(data, opts) {
     opts.distanceMin = opts.distanceMax;
     opts.distanceMax = help;
   }
-
+  
   let dotkey = opts.dotNum.toString().padStart(3, '0');
   console.log('ADDING TO STREAM', dotkey, '(' + opts.steps + ' steps)')
   // determine start location (given, from previous, random)
@@ -654,7 +656,7 @@ async function addSamplePath(data, opts) {
       console.log('  previous location:', last[0], last[1], "start at:", loc[0], loc[1]);
     } else {
       // get a random start location
-      let loc = await sampleLocation();
+      let loc = await sampleLocation(); 
       opts.startLatitude  = loc[0];
       opts.startLongitude = loc[1];
       console.log('  start at random location:', loc[0], loc[1]);
@@ -662,10 +664,10 @@ async function addSamplePath(data, opts) {
   } else {
     console.log('  start at forced location:', opts.startLatitude, opts.startLongitude);
   }
-
+  
   // generate stream of locations
   let locs = [opts.startLatitude, opts.startLongitude];
-  if (opts.steps <= 0) opts.steps = 1;
+  if (opts.steps <= 0) opts.steps = 1; 
   for (let i=0; i<opts.steps-1; i++) {
     let dist = Math.floor( opts.distanceMin + Math.random() * (opts.distanceMax - opts.distanceMin) );
     let prevLoc = locs.slice(i*2, i*2+2);
@@ -673,7 +675,7 @@ async function addSamplePath(data, opts) {
     loc = loc.slice(0, 2);
     locs.push(...loc);
   }
-
+  
   // paths property
   let path = data.paths[dotkey] || [];
   path.push(...locs);
@@ -681,10 +683,10 @@ async function addSamplePath(data, opts) {
     path = path.slice(- PATH_MAX_POINTS * 2);
   }
   data.paths[dotkey] = path;
-
+  
   // last updated property
   data.last_updated_path = dotkey;
-
+  
   return data;
 }
 
@@ -702,7 +704,7 @@ export async function samplePathData(opts) {
   if ( opts.dotNum === undefined || opts.dotNum === null || isNaN(opts.dotNum) ) {
     opts.dotNum = Math.floor( 1 + Math.random() * 320 );
   }
-
+  
   let data = (await db.doc('paths/paths').get()).data();
   data = await addSamplePath(data, opts);
   // console.log(data);
@@ -720,22 +722,22 @@ export async function samplePathDataMultiple(opts) {
     stepChance: 1,
   };
   opts = Object.assign({}, defaults, opts);
-
+  
   if (opts.startDot > opts.endDot) {
     let help = opts.startDot;
     opts.startDot = opts.endDot;
     opts.endDot = help;
   }
-
+  
   if (opts.startDot < 0 || opts.startDot > 321 || opts.endDot < 0 || opts.endDot > 321) {
     console.warn('sampleScatterData: Invalid startDot / endDot parameters');
     return;
   }
-
+  
   let data = (await db.doc('paths/paths').get()).data();
-
+  
   for (let dotNum = opts.startDot; dotNum <= opts.endDot; dotNum++) {
-    // how many steps to add to this dot stream
+    // how many steps to add to this dot stream 
     let steps = 0;
     for (let i=0; i<opts.steps; i++) { if (Math.random() < opts.stepChance) steps++; }
     // add to dot stream
@@ -746,7 +748,7 @@ export async function samplePathDataMultiple(opts) {
       steps,
     });
   }
-
+  
   // update data
   console.log('setting data', data);
   return db.doc('paths/paths').set(data);
@@ -774,17 +776,17 @@ export async function resetUploads() {
   await deleteCollection(db, 'uploads', 100).then(() => {
     console.log('  Note: Deleted uploads collection');
   });
-
+  
   // delete storage
   // needs list and delete permissions (write)
   let result = await storage.ref('/').listAll();
   let folderRefs = result.prefixes;
-
+  
   let filePromises = folderRefs.map(ref => ref.listAll());
-
+  
   result = await Promise.all(filePromises);
   let fileRefs = result.reduce((acc, res) => acc.concat(res.items), []);
-
+  
   let deletePromises = fileRefs.map(ref => ref.delete());
   return Promise.all(deletePromises).then(() => {
     console.log('  Note: Deleted images in storage bucket');
@@ -841,14 +843,14 @@ export async function initDatabase() {
   }).then(() => {
     console.log('  paths initialized');
   });
-
+  
   // stats
   await db.doc('stats/stats').set({
     uploadCount: 0
   }).then(() => {
     console.log('  stats initialized');
   });
-
+  
   // codes
   let codes;
   try {
@@ -859,7 +861,7 @@ export async function initDatabase() {
     console.log('Couldn\'t load upload codes');
     return;
   }
-
+  
   let batch = db.batch();
   for (let [idx, code] of codes.entries()) {
     batch.set(
