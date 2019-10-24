@@ -582,7 +582,7 @@ function loop(time) { // eslint-disable-line no-unused-vars
   // console.log(performance.memory)
 
   if (first_frame) { // show canvas after first frame is rendered
-    document.querySelector('canvas').classList.remove('hidden');
+    document.querySelector('canvas').classList.add('show');
     first_frame = false;
   }
 }
@@ -645,7 +645,7 @@ function initPageElements() {
 
   // live upload count
   lbu.setupUploadCounter({ selector: '#count_connected' }).then(() => {
-    document.querySelector('.counter').classList.remove('hidden');
+    document.querySelector('.counter').classList.add('show');
   });
 
   // code entry

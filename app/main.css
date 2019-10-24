@@ -642,7 +642,7 @@ hr.new {
 
 .counter { transition: opacity 1s; opacity:1; transition-delay: 1s; }
 canvas { transition: opacity 2s; opacity:1; transition-delay: 0.5s; }
-.hidden { opacity:0 !important; }
+.show, .show[style] { opacity:1 !important; }
 
 
 

@@ -1,28 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="robots" content="noindex,nofollow"> <!-- TODO: REMOVE IN PRODUCTION -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Let's build Utopia</title>
+  <meta name="title" content="Let's build Utopia">
+  <meta name="description" content="Stand with us for a more inclusive world and join our celebration of diversity.">
+
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/foundation-sites@6.5.3/dist/css/foundation.min.css">
   <link rel="stylesheet" href="./app/main.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ionicons@4.6.3/dist/css/ionicons.min.css">
   <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico">
   <link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
-  <meta name="twitter:card" content="summary" />
-  <meta property="og:image" content="./assets/lbu_card.jpg" />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://letsbuildutopia.com" />
-  <meta property="og:title" content="let's Build Utopia" />
-  <meta property="og:description" content="Stand with us for a more inclusive world and join our celebration of diversity." />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://letsbuildutopia.com/">
+  <meta property="og:title" content="Let's build Utopia">
+  <meta property="og:description" content="Stand with us for a more inclusive world and join our celebration of diversity.">
+  <meta property="og:image" content="https://letsbuildutopia.com/lbu_card.c713033a.jpg">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://letsbuildutopia.com/">
+  <meta property="twitter:title" content="Let's build Utopia">
+  <meta property="twitter:description" content="Stand with us for a more inclusive world and join our celebration of diversity.">
+  <meta property="twitter:image" content="https://letsbuildutopia.com/lbu_card.c713033a.jpg">
+
+  <!-- Google schema.org -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Project",
+      "name": "Let's Build Utopia",
+      "url": "https://letsbuildutopia.com/",
+      "logo": "https://letsbuildutopia.com/logo-lbu.01c241ef.png",
+      "sameAs": "https://www.instagram.com/letsbuildutopia/"
+    }
+  </script>
+
 </head>
 <body>
     <div class="grid-x" id="clicker">
       <div class="cell">
         <div class="outercanvas">
-          <canvas class="hidden"></canvas>
-          <div class="counter hidden">LET LOVE GROW<br /><span id="count_connected"></span> of <span id="count_total">456123451</span><br />humans are connected
+          <canvas style="opacity:0;"></canvas>
+          <div class="counter" style="opacity:0;">LET LOVE GROW<br /><span id="count_connected"></span> of <span id="count_total">456123451</span><br />humans are connected
           </div>
         </div>
       </div>
@@ -512,5 +535,7 @@
   <!--MAIN-->
   <script type="module" src="./app/main.js"></script>
   <!--/MAIN-->
+  <!-- for card generation only: -->
+  <img src="./assets/lbu_card.jpg" alt="" style="display:none;">
 </body>
 </html>
