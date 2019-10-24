@@ -668,11 +668,13 @@ function dist(p0, p1) {
 
 function initUpload() {
   const log = console.log;
-
   document.querySelector('.finaluploadbutton').addEventListener('click', e => {
     e.preventDefault();
 
     log('UPLOAD STARTED');
+    document.querySelector('.finaluploadbutton').classList.add('disabled');
+    document.querySelector('.finaluploadbutton').innerHTML = 'Uploading...';
+
     document.getElementById("MissingFile").style.display = "none";
     document.getElementById("InvalidFileParameter").style.display = "none";
     document.getElementById("InvalidFileType").style.display = "none";
@@ -749,6 +751,9 @@ function initUpload() {
       if(err.name == 'UploadError') { document.getElementById("UploadError").style.display = "block"; }
       if(err.name == 'MissingCode') { document.getElementById("MissingCode").style.display = "block"; }
       throw err.message;
+    }).finally(() => {
+      document.querySelector('.finaluploadbutton').classList.remove('disabled');
+      document.querySelector('.finaluploadbutton').innerHTML = 'Upload';
     });
   });
 }
