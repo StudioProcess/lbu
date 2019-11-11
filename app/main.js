@@ -46,6 +46,8 @@ var Params = function() {
 };
 var params = new Params();
 
+let remap = true; // set false do de-active LAT/LON-mapping and use real data
+
 let fontMesh;
 
 function changeView(){
@@ -214,6 +216,23 @@ lbu.onData( ( data ) => {
   let noOfStream = 0;
   let lastUpdatedPathIndex;
 
+  //mapping of lat lon
+  for (let key of Object.keys(data.paths)) {
+    let points = data.paths[key];
+
+    for(let u = 0; u < points.length-1; u++) { // for all previous points for each streams
+      let lat = data.paths[key][u];
+      let lon = data.paths[key][u+1];
+
+      if (lat <= minLat) { minLat = lat; }
+      if (lat >= maxLat) { maxLat = lat; }
+
+      if (lon <= minLon) { minLon = lon; }
+      if (lon >= maxLon) { maxLon = lon; }
+      u++;
+    }
+  }
+
   // BEGIN using original data
   for (let key of Object.keys(data.paths) ) {
     let points = data.paths[key]; // array of points for individual stream
@@ -229,9 +248,15 @@ lbu.onData( ( data ) => {
       // transformation: lat/lon -> x/y/z
       let coordinatesOnStream = [];
       for(let t = 0; t < points.length-1; t++) {
-
         var lat = points[t];
         var lon = points[t+1];
+
+        if(remap) {
+
+          lat = lat.map(minLat, maxLat, 0, 90);
+          lon = lon.map(minLon, maxLon, -180, 180);
+        }
+
 
         var cosLat = Math.cos(lat * Math.PI / 180.0);
         var sinLat = Math.sin(lat * Math.PI / 180.0);
@@ -241,7 +266,6 @@ lbu.onData( ( data ) => {
         let x = rad * cosLat * cosLon;
         let y = rad * cosLat * sinLon;
         let z = rad * sinLat;
-
         // if(t == 0) { coordinatesOnStream.push( {x: 0, y: 0, z: 0} ); }
         coordinatesOnStream.push( {x: x, y: y, z: z} ); // change to {x: x, y: y, z: z} for globe view
       }
