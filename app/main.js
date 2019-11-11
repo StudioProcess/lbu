@@ -47,6 +47,7 @@ var Params = function() {
 var params = new Params();
 
 let remap = true; // set false do de-active LAT/LON-mapping and use real data
+let mappingImpact = 0.11; // between 0,1;  1=high mapping (stretching), 0.0001=almost no mapping
 
 let fontMesh;
 
@@ -253,8 +254,8 @@ lbu.onData( ( data ) => {
 
         if(remap) {
 
-          lat = lat.map(minLat, maxLat, 0, 90);
-          lon = lon.map(minLon, maxLon, -180, 180);
+          lat = lat.map(minLat, maxLat, 0, 90*mappingImpact);
+          lon = lon.map(minLon, maxLon, -180*mappingImpact, 180*mappingImpact);
         }
 
 
