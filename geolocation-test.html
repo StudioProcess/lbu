@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Geolocation Test</title>
+  <style>
+    * { font-family: system-ui; }
+    pre {white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h2>Browser</h2>
+  <pre id="browser"></pre>
+  
+  <h2>Geolocation supported in browser</h2>
+  <div id="support"></div>
+  
+  <h2>Current location</h2>
+  <!-- <input id="request" type="button" value="Request"> -->
+  <pre id="location"></pre>
+  
+  <script type="module">
+    function msg(str, selector, color='black') {
+      let el = document.querySelector(selector);
+      el.style.color = color;
+      el.textContent = str;
+    }
+    
+    msg(`User Agent: ${navigator.userAgent}\nVendor: ${navigator.vendor}\nPlatform: ${navigator.platform}`,'#browser', 'black')
+    
+    if ('geolocation' in navigator) {
+      msg('YES', '#support', 'green');
+    } else {
+      msg('NO', '#support', 'red');
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      msg("Please wait...", '#location', 'blue');
+      navigator.geolocation.getCurrentPosition(pos => {
+        let loc = {
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+          accuracy: pos.coords.accuracy,
+          timestamp: new Date(pos.timestamp),
+        };
+        msg(`SUCCESS\nLatitude: ${loc.latitude}\nLongitude: ${loc.longitude}\nTime: ${loc.timestamp}`, '#location', 'green');
+      },
+      err => {
+        console.log(err);
+        msg(`FAILURE\nError: ${err.message}\nCode: ${err.code}`, '#location', 'red');
+      },
+      {}
+      );
+    });
+  </script>
+  
+</body>
+</html>

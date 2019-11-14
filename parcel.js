@@ -25,6 +25,7 @@ exec(`rm -rf dist`);
 
 // run parcel
 exec(`npx parcel build index.html`);
+exec(`npx parcel build geolocation-test.html`);
 
 // remove type="module" from script tag in bundled html
 const INDEX_FILE = './dist/index.html';

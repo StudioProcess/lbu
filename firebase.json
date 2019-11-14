@@ -5,6 +5,9 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+    ],
+    "rewrites": [
+      { "source": "/geotest", "destination": "/geolocation-test.html" }
     ]
   }
 }
