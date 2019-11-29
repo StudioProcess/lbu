@@ -29,6 +29,21 @@ canvas {
   z-index: -1;
 }
 
+#overlay {
+  position: fixed; /* Sit on top of the page content */
+  display: visible; /* Hidden by default */
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0%;
+  left: 0%;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(36,82,194,0.8); /* Black background with opacity */
+  z-index: 20;  Specify a stack order in case you're using a different order for other elements */
+  cursor: pointer; /* Add a pointer on hover */
+  overflow: hidden
+}
+
 #upload_count_success {
   display: none;
 }
@@ -152,6 +167,16 @@ hr.new {
 }
 
 @media only screen and (min-width: 760px) {
+
+  #warningtext{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    font-size: 30px;
+    color: white;
+    transform: translate(-50%,-50%);
+    -ms-transform: translate(-50%,-50%);
+  }
 
   .titleresize-found-one {
     text-align: center;
@@ -805,6 +830,17 @@ http://stackoverflow.com/a/34696029/383904
 
 /* Mobile Layout */
 @media only screen and (max-width: 759px) {
+
+  #warningtext{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    font-size: 20px;
+    color: white;
+    transform: translate(-50%,-50%);
+    -ms-transform: translate(-50%,-50%);
+  }
+
   .logo {
     width: 80% !important;
     height: 80px !important;

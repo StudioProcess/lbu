@@ -41,6 +41,12 @@
 
 </head>
 <body>
+  <div id="overlay">
+    <div id="warningtext">
+      Please note: In order to participate in this art project, you need to enable "location services". Your data will not be shared and only be used for this artwork.<br /><br />
+      <button class="uploadbutton" onclick="off()">Okay</button></div>
+  </div>
+
     <div class="grid-x" id="clicker">
       <div class="cell">
         <div class="outercanvas">
@@ -538,5 +544,14 @@
   <!--/MAIN-->
   <!-- for card generation only: -->
   <img src="./assets/lbu_card.jpg" alt="" style="display:none;">
+  <script>
+    function on() {
+      document.getElementById("overlay").style.display = "block";
+    }
+
+    function off() {
+      document.getElementById("overlay").style.display = "none";
+    }
+  </script>
 </body>
 </html>
