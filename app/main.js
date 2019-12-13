@@ -46,7 +46,7 @@ var Params = function() {
 };
 var params = new Params();
 
-let remap = true; // set false do de-active LAT/LON-mapping and use real data
+let remap = false; // set false do de-active LAT/LON-mapping and use real data
 let mappingImpact = 0.10; // between 0,1;  1=high mapping (stretching), 0.0001=almost no mapping(original)
 
 let fontMesh;
@@ -560,7 +560,7 @@ function loop(time) { // eslint-disable-line no-unused-vars
 
   camera.lookAt(scene.position);
 
-  if(viewMode == 1) {
+  if(viewMode == 3) {
     cameraX = 20;
     cameraY = 10;
     cameraZ = 50;
@@ -572,7 +572,7 @@ function loop(time) { // eslint-disable-line no-unused-vars
     cameraZ = 40;
   }
 
-  if(viewMode == 3) {
+  if(viewMode == 1) {
     cameraX = 30;
     cameraY = 20;
     cameraZ = 60;
