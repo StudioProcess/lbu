@@ -24,7 +24,7 @@ function exec(cmd, continueOnFailure = false) {
 exec(`rm -rf dist`);
 
 // run parcel
-exec(`npx parcel build index.html`);
+exec(`npx parcel build index.html --public-url /`);
 exec(`npx parcel build geolocation-test.html`);
 
 // remove type="module" from script tag in bundled html
