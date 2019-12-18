@@ -36,7 +36,7 @@ fs.writeFileSync(INDEX_FILE, index);
 // copy robots.txt if it's there
 try {
   fs.copySync('./robots.txt', './dist/robots.txt')
-  console.log('WARNING: Copied robots.txt. REMOVE ROBOTS.TXT IN PRODUCTION TO ALLOW INDEXING!');
+  console.log('WARNING: Copied robots.txt. REMOVE ROBOTS.TXT IN OR MAKE SURE IT ALLOWS INDEXING PRODUCTION!');
 } catch (err) {
   // nop
 }

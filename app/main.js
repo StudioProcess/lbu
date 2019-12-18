@@ -2,7 +2,7 @@ import '../node_modules/regenerator-runtime/runtime.js'; // Needed for bundling 
 import * as THREE from '../node_modules/three/build/three.module.js';
 import { OrbitControls } from '../node_modules/three/examples/jsm/controls/OrbitControls.js';
 import { MeshLine, MeshLineMaterial } from './THREE.MeshLine.module.js';
-import * as util from './util.js';
+// import * as util from './util.js';
 import * as lbu from '../node_modules/lbu-firebase/public/lbu.js';
 import font from '../assets/fonts/Roboto_Regular.js';
 
