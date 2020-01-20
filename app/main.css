@@ -841,6 +841,10 @@ http://stackoverflow.com/a/34696029/383904
     transform: translate(-50%,-50%);
     -ms-transform: translate(-50%,-50%);
   }
+  
+  .messageupload {
+    margin-top: 2em;
+  }
 
   .logo {
     width: 80% !important;
