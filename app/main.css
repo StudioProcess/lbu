@@ -514,6 +514,7 @@ hr.new {
     cursor: pointer;
     background-image: url('../assets/photos/placeholder_photo_circle_red.png') !important;
     background-position: center;
+    background-size: contain;
     background-repeat: no-repeat;
   }
 
@@ -972,6 +973,7 @@ http://stackoverflow.com/a/34696029/383904
     cursor: pointer;
     background-image: url('../assets/photos/placeholder_photo_circle_red.png') !important;
     background-position: center;
+    background-size: contain;
     background-repeat: no-repeat;
   }
 
