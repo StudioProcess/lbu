@@ -512,7 +512,6 @@ hr.new {
     align-items: center !important;
     justify-content: center;
     display: flex;
-    cursor: pointer;
     background-image: url('../assets/photos/placeholder_photo_circle_red.png') !important;
     background-position: center;
     background-size: contain;
@@ -971,7 +970,6 @@ http://stackoverflow.com/a/34696029/383904
     align-items: center !important;
     justify-content: center;
     display: flex;
-    cursor: pointer;
     background-image: url('../assets/photos/placeholder_photo_circle_red.png') !important;
     background-position: center;
     background-size: contain;
