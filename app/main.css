@@ -4,6 +4,7 @@ body {
   /* background-color: #cce0e7; */
   /* background-color: #0e6eca; */
   font-family: 'Montserrat', 'Arial', sans-serif !important;
+  overflow-x: hidden;
 }
 
 .outercanvas {
