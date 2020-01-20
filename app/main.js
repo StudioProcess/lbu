@@ -676,7 +676,7 @@ function initPageElements() {
   // code entry
   lbu.setupCodeEntry({ code_input: '#code', digit_buttons: '#keypad button[data-digit]', delete_button: '#keypad button.delete' });
 
-  lbu.setupImageSelect({ input: '#exampleFileUpload', background: '.image-upload' }).then(e => {
+  lbu.setupImageSelect({ input: '#exampleFileUpload', background: '.image-display', exifRotate: true }).then(e => {
     // NOTE: this code is run when an image is selected the first time
     // NOTE: 'Choose Photo' input button is hidden
     // document.getElementById("uploadlabel").style.display = "none";

@@ -19,7 +19,7 @@
   "author": "Process <contact@process.studio> (https://process.studio)",
   "license": "AGPL-3.0",
   "dependencies": {
-    "lbu-firebase": "git+https://github.com/StudioProcess/lbu-firebase.git#3b46a37",
+    "lbu-firebase": "git+https://github.com/StudioProcess/lbu-firebase.git#bb36790",
     "regenerator-runtime": "^0.13.3",
     "three": "^0.108.0"
   },
