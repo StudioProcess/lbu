@@ -167,6 +167,22 @@ hr.new {
   border-radius: 2px;
 }
 
+.instagramlink {
+  background-color: #fff;
+  margin: 0.1em !important;
+  /* padding: 0.5rem 1rem !important; */
+  padding:0 0.7rem!important;
+  height: 42px;
+}
+
+.instagramlink i {
+  font-size: 25px;
+  margin: auto;
+  line-height: 1.8;
+  width: auto;
+  width: auto;
+}
+
 @media only screen and (min-width: 760px) {
 
   #warningtext{
@@ -1176,5 +1192,12 @@ http://stackoverflow.com/a/34696029/383904
     padding-top: 2em;
     padding-bottom: 2em;
     text-align: center;
+  }
+  
+  .instagramlink {
+    height:34px;
+  }
+  .instagramlink i {
+    font-size: 20px;
   }
 }
