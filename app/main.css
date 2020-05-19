@@ -167,6 +167,27 @@ hr.new {
   border-radius: 2px;
 }
 
+.patreonlink {
+  background-color: #fff;
+  margin: 0.1em !important;
+  /* padding: 0.5rem 1rem !important;
+  padding:0 0.7rem!important; */
+  padding-top: 0!important;
+  padding-bottom: 0!important;
+  padding-left: 0.7rem!important;
+  padding-right: 0.7rem!important;
+  height: 42px;
+  width: 42px;
+}
+
+.patreonlink img {
+  /* margin: auto; */
+  padding-top:  0.7rem !important;
+  min-width: 20px !important;
+  /* width: 28px !important; */
+  line-height: 1.8;
+}
+
 .instagramlink {
   background-color: #fff;
   margin: 0.1em !important;
@@ -179,7 +200,6 @@ hr.new {
   font-size: 25px;
   margin: auto;
   line-height: 1.8;
-  width: auto;
   width: auto;
 }
 
@@ -913,7 +933,7 @@ http://stackoverflow.com/a/34696029/383904
 
   .lbu {
     top: 15px !important;
-    right: 0em !important;
+    right: 0.2em !important;
     position: fixed !important;
     z-index: 5;
 
@@ -1199,5 +1219,23 @@ http://stackoverflow.com/a/34696029/383904
   }
   .instagramlink i {
     font-size: 20px;
+  }
+  
+  .patreonlink {
+    height:34px;
+    width:34px;
+  }
+
+  .patreonlink img {
+    padding-top:  0.7rem !important;
+    height: 24px;
+    /* min-width: 10px !important; */
+    /* width: 28px !important; */
+    line-height: 1.1;
+  }
+  
+  .menu a {
+    padding-left: 7px !important;
+    padding-right: 7px !important;
   }
 }
